@@ -425,38 +425,39 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 1 — Project Foundation
 
-1. [ ] **Brick 1 — Next.js scaffold**
+1. [x] **Brick 1 — Next.js scaffold**
    - File: `frontend/`
    - Command: `npx create-next-app@latest . --typescript --tailwind --eslint --app`
    - Done when: dev server runs, blank page loads, no errors
 
-2. [ ] **Brick 2 — Dependency installation**
-   - Install: `framer-motion reactflow recharts lucide-react @phosphor-icons/react`
-   - Install: `npx shadcn-ui@latest init`
+2. [x] **Brick 2 — Dependency installation**
+   - Command 1: `npm install framer-motion @xyflow/react recharts lucide-react @phosphor-icons/react`
+   - Command 2: `npx shadcn@latest init -d` (Supports Tailwind v4)
    - Done when: all packages resolve, no peer dep errors
 
-3. [ ] **Brick 3 — Tailwind config**
-   - File: `tailwind.config.js`
-   - Add: Space Grotesk + Geist Mono font families
-   - Add: extended color palette (all 11 base tokens + 5 accent colors)
-   - Add: custom shadow utilities (`shadow-neu-raised`, `shadow-neu-inset`)
+3. [x] **Brick 3 — Tailwind v4 Config / Global CSS**
+   - File: `app/globals.css`
+   - Add: Space Grotesk + Geist Mono font variables
+   - Add: `@theme` extended color palette (all 11 base tokens + 5 accent colors)
+   - Add: custom shadow utilities (`--shadow-neu-raised`, `--shadow-neu-inset`)
+   - Add: CSS variables for base surface tokens
    - Done when: custom classes work in a test component
 
-4. [ ] **Brick 4 — Global CSS + CSS variables**
+4. [x] **Brick 4 — Global CSS + CSS variables**
    - File: `app/globals.css`
    - Add: CSS variables for all palette tokens
    - Add: neomorphic shadow variables
    - Add: base `body` dark background (#1A1A1A)
    - Done when: page background is #1A1A1A
 
-5. [ ] **Brick 5 — Root layout with fonts**
+5. [x] **Brick 5 — Root layout with fonts**
    - File: `app/layout.tsx`
    - Add: `Space_Grotesk` + `Geist_Mono` via `next/font/google`
    - Add: CSS variable injection (`--font-sans`, `--font-mono`)
    - Add: base html/body classes
    - Done when: fonts load correctly in browser
 
-6. [ ] **Brick 6 — Shared TypeScript types**
+6. [x] **Brick 6 — Shared TypeScript types**
    - File: `types/runtime.ts`
    - Define: Mission, Task, Resource, Event, Divergence, RepairPolicy, Adapter types
    - Done when: types file compiles with no errors
@@ -465,24 +466,24 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 2 — Home Page (brick by brick)
 
-7. [ ] **Brick 7 — PlaygroundHero component**
+7. [x] **Brick 7 — PlaygroundHero component**
    - File: `components/layout/PlaygroundHero.tsx`
    - Content: MatrixOS logo text + tagline + subtitle
    - Style: centered, Space Grotesk 700, dark background
    - Done when: renders correctly on `/` route
 
-8. [ ] **Brick 8 — AdapterBadge component**
+8. [x] **Brick 8 — AdapterBadge component**
    - File: `components/runtime/AdapterBadge.tsx`
    - Variants: `live` (green pulse dot) | `coming-soon` (grey, disabled)
    - Done when: both badge states render with correct colors
 
-9. [ ] **Brick 9 — AdapterCard component**
+9. [x] **Brick 9 — AdapterCard component**
    - File: `components/runtime/AdapterCard.tsx`
    - Props: `name`, `description`, `status` (live | coming-soon), `icon`, `href`
    - Style: dark neomorphic raised card, hover lift effect (Framer Motion)
    - Done when: all 3 adapter cards render on home page
 
-10. [ ] **Brick 10 — Home page assembly**
+10. [x] **Brick 10 — Home page assembly**
     - File: `app/page.tsx`
     - Assemble: PlaygroundHero + 3 AdapterCards (Airport live, Hospital stub, Warehouse stub)
     - Route: Airport card links to `/playground/airport`
@@ -492,18 +493,18 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 3 — Dashboard Shell (brick by brick)
 
-11. [ ] **Brick 11 — Dashboard layout shell**
+11. [x] **Brick 11 — Dashboard layout shell**
     - File: `app/playground/[adapter]/layout.tsx`
     - Structure: Header bar + three-column content area + bottom metrics bar slots
     - NO content yet — just the grid/flex skeleton
     - Done when: layout renders with visible grid lines (use border outlines)
 
-12. [ ] **Brick 12 — Header component**
+12. [x] **Brick 12 — Header component**
     - File: `components/layout/Header.tsx`
     - Content: MatrixOS wordmark | Adapter name pill | Runtime status indicator (LIVE dot)
     - Done when: renders in dashboard layout with mock adapter name "Airport"
 
-13. [ ] **Brick 13 — PanelLayout component**
+13. [x] **Brick 13 — PanelLayout component**
     - File: `components/layout/PanelLayout.tsx`
     - Props: `left`, `center`, `right` (ReactNode slots)
     - Style: glassmorphism panels (backdrop-blur, subtle border, #292929 bg)
@@ -513,20 +514,20 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 4 — Left Panel: World State (brick by brick)
 
-14. [ ] **Brick 14 — ResourceBadge component**
+14. [x] **Brick 14 — ResourceBadge component**
     - File: `components/runtime/ResourceBadge.tsx`
     - Props: `name`, `type`, `status` (available | occupied | unavailable | failed)
     - Style: small pill with status color dot
     - Done when: 4 status variants render correctly
 
-15. [ ] **Brick 15 — MissionCard component**
+15. [x] **Brick 15 — MissionCard component**
     - File: `components/runtime/MissionCard.tsx`
     - Props: `id`, `type`, `status`, `priority`, `deadline`, `tasks[]`
     - Style: neomorphic raised card, status color left border
     - States: normal | in-progress | delayed | recovered | diverged
     - Done when: card renders with mock airport mission data
 
-16. [ ] **Brick 16 — Left panel assembly**
+16. [x] **Brick 16 — Left panel assembly**
     - File: `components/runtime/WorldStatePanel.tsx`
     - Content: "MISSIONS" section label + list of MissionCards
     - Content: "RESOURCES" section label + list of ResourceBadges
@@ -537,19 +538,17 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 5 — Center Panel: Operational Graph (brick by brick)
 
-17. [ ] **Brick 17 — React Flow base canvas**
+17. [x] **Brick 17 — OperationalGraph component**
     - File: `components/runtime/OperationalGraph.tsx`
-    - Setup: ReactFlow provider, blank canvas, dark background
-    - Done when: empty graph canvas renders without errors
 
-18. [ ] **Brick 18 — Custom node types**
+18. [x] **Brick 18 — Custom node types**
     - File: `components/runtime/nodes/MissionNode.tsx`
     - File: `components/runtime/nodes/TaskNode.tsx`
     - File: `components/runtime/nodes/ResourceNode.tsx`
     - Style: colored by type, Geist Mono labels, neomorphic border
     - Done when: 3 node types render on the canvas
 
-19. [ ] **Brick 19 — Static airport graph**
+19. [x] **Brick 19 — Static airport graph**
     - File: `lib/adapters/airport.ts`
     - Define: mock nodes (3 missions, 9 tasks, 6 resources) + edges
     - Done when: full airport operational graph renders on canvas with all node types
@@ -558,19 +557,19 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 6 — Right Panel: Runtime Reasoning (brick by brick)
 
-20. [ ] **Brick 20 — ReasoningPanel shell**
+20. [x] **Brick 20 — ReasoningPanel shell**
     - File: `components/runtime/ReasoningPanel.tsx`
     - Content: placeholder sections for Impact / Decision / Validation
     - Style: glassmorphism, Geist Mono text throughout
     - Done when: empty panel renders with section labels
 
-21. [ ] **Brick 21 — DivergenceAlert component**
+21. [x] **Brick 21 — DivergenceAlert component**
     - File: `components/runtime/DivergenceAlert.tsx`
     - Props: `eventType`, `affectedMissions[]`, `severity`
     - Style: red border, Framer Motion pulse animation
     - Done when: alert renders and pulses with mock data
 
-22. [ ] **Brick 22 — ValidationResult component**
+22. [x] **Brick 22 — ValidationResult component**
     - File: `components/runtime/ValidationResult.tsx`
     - Props: `status` (PASS | REJECTED), `reason`
     - Style: green for PASS, red flash + shake for REJECTED
@@ -580,15 +579,15 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 7 — Bottom: Metrics Bar (brick by brick)
 
-23. [ ] **Brick 23 — MetricTile component**
+23. [x] **Brick 23 — MetricTile component**
     - File: `components/runtime/MetricTile.tsx`
     - Props: `label`, `value`, `unit`, `trend` (up | down | neutral)
     - Style: neomorphic inset display, Geist Mono value, Space Grotesk label
     - Done when: single tile renders with mock number
 
-24. [ ] **Brick 24 — MetricsBar assembly**
+24. [x] **Brick 24 — MetricsBar assembly**
     - File: `components/runtime/MetricsBar.tsx`
-    - Content: 5 MetricTiles: Recovery Time | Repairs Issued | Delay Reduction | Invariant Violations Prevented | Resource Utilization
+    - Assemble: 4-5 MetricTiles across the bottom | Recovery Time | Repairs Issued | Delay Reduction | Invariant Violations Prevented | Resource Utilization
     - Mock data: static numbers
     - Done when: full bottom strip renders across dashboard
 
@@ -596,33 +595,33 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 8 — Dashboard Final Assembly
 
-25. [ ] **Brick 25 — Full dashboard page**
+25. [x] **Brick 25 — Dashboard integration**
     - File: `app/playground/[adapter]/page.tsx`
-    - Assemble: Header + PanelLayout(WorldStatePanel, OperationalGraph, ReasoningPanel) + MetricsBar
+    - Replace bottom placeholder with `MetricsBar` | PanelLayout(WorldStatePanel, OperationalGraph, ReasoningPanel) + MetricsBar
     - Done when: complete 3-panel dashboard renders with all mock data
 
 ---
 
 ## PHASE 9 — Event Stream Page (brick by brick)
 
-26. [ ] **Brick 26 — EventRow component**
+26. [x] **Brick 26 — EventRow component**
     - File: `components/runtime/EventRow.tsx`
     - Props: `id`, `type`, `timestamp`, `severity`, `description`
     - Style: color-coded row, Geist Mono ID + timestamp, slide-in animation
     - Done when: single event row renders
 
-27. [ ] **Brick 27 — EventStream component**
+27. [x] **Brick 27 — EventStream component**
     - File: `components/runtime/EventStream.tsx`
     - Content: scrollable list of EventRows with mock data
     - Done when: 10 mock events render in scrollable feed
 
-28. [ ] **Brick 28 — TriggerEventPanel component**
+28. [x] **Brick 28 — TriggerEventPanel component**
     - File: `components/runtime/TriggerEventPanel.tsx`
     - Content: buttons for each scripted event (FuelTruckFailure, HeavyRain, GateBlocked, CrewUnavailable, EmergencyArrival)
     - Style: neomorphic raised buttons, one per disruption type
     - Done when: panel renders with 5 trigger buttons
 
-29. [ ] **Brick 29 — Events page assembly**
+29. [x] **Brick 29 — Events page assembly**
     - File: `app/playground/[adapter]/events/page.tsx`
     - Assemble: TriggerEventPanel + EventStream
     - Done when: full events page renders
@@ -631,19 +630,19 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 10 — Recovery Console Page (brick by brick)
 
-30. [ ] **Brick 30 — PipelineStep component**
+30. [x] **Brick 30 — PipelineStep component**
     - File: `components/runtime/PipelineStep.tsx`
     - Props: `step`, `title`, `status` (pending | active | complete | rejected), `content`
     - Style: numbered step with connector line, status color
     - Done when: single pipeline step renders in both states
 
-31. [ ] **Brick 31 — RecoveryConsole component**
+31. [x] **Brick 31 — RecoveryConsole component**
     - File: `components/runtime/RecoveryConsole.tsx`
     - Content: 5 PipelineSteps (Impact → Reasoning → Decision → Validation → Execution)
     - Mock data: static airport scenario
     - Done when: full recovery pipeline renders with mock data
 
-32. [ ] **Brick 32 — Recovery page assembly**
+32. [x] **Brick 32 — Recovery page assembly**
     - File: `app/playground/[adapter]/recovery/page.tsx`
     - Assemble: RecoveryConsole + DivergenceAlert
     - Done when: full recovery page renders
@@ -652,19 +651,19 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 11 — Memory Page (brick by brick)
 
-33. [ ] **Brick 33 — MemoryTable component**
+33. [x] **Brick 33 — MemoryTable component**
     - File: `components/runtime/MemoryTable.tsx`
     - Content: table of past recoveries (id, type, strategy, confidence, outcome)
     - Style: Geist Mono data cells, sortable columns
     - Done when: table renders with 10 mock recovery rows
 
-34. [ ] **Brick 34 — ConfidenceChart component**
+34. [x] **Brick 34 — ConfidenceChart component**
     - File: `components/runtime/ConfidenceChart.tsx`
     - Library: Recharts BarChart
     - Content: strategy name vs confidence score
     - Done when: chart renders with mock strategy data
 
-35. [ ] **Brick 35 — Memory page assembly**
+35. [x] **Brick 35 — Memory page assembly**
     - File: `app/playground/[adapter]/memory/page.tsx`
     - Assemble: MemoryTable + ConfidenceChart + tab switcher (Episodic / Semantic / Procedural)
     - Done when: full memory page renders
@@ -673,12 +672,12 @@ Edges: depends_on | assigned_to | blocks | requires | violates | produces | obse
 
 ## PHASE 12 — Stub Pages
 
-36. [ ] **Brick 36 — Hospital stub page**
+36. [x] **Brick 36 — Hospital stub page**
     - File: `app/playground/hospital/page.tsx`
     - Content: "Coming Soon" message + HospitalAdapter card
     - Done when: page renders and links back to home
 
-37. [ ] **Brick 37 — Warehouse stub page**
+37. [x] **Brick 37 — Warehouse stub page**
     - File: `app/playground/warehouse/page.tsx`
     - Same as hospital stub
     - Done when: page renders and links back to home
