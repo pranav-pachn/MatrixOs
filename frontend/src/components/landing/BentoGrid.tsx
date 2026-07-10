@@ -3,96 +3,84 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Graph, Lightning, ChartLineUp } from "@phosphor-icons/react/dist/ssr";
+import CardSwap, { Card } from "./CardSwap";
 
 export function BentoGrid() {
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-24">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ duration: 0.6 }}
-        className="mb-12 text-center md:text-left"
-      >
-        <h2 className="text-3xl md:text-5xl font-bold font-sans tracking-tight text-foreground">
-          Built for physical scale.
-        </h2>
-        <p className="text-lg text-muted-foreground mt-4 max-w-2xl">
-          MatrixOS replaces fragmented dashboards with a single, unified operational graph powered by autonomous constraint engines.
-        </p>
-      </motion.div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         
-        {/* Bento Box 1: Large */}
+        {/* Left Column: Headline & Description */}
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="md:col-span-2 bg-[#0A0A0C] border border-white/[0.05] rounded-3xl p-8 relative overflow-hidden group shadow-neu-inset hover:border-primary/30 transition-colors"
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className="max-w-xl"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-          <div className="relative z-10 flex flex-col h-full justify-between min-h-[300px]">
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center mb-6 text-foreground">
-                <Graph size={24} weight="duotone" />
-              </div>
-              <h3 className="text-2xl font-bold font-sans text-foreground mb-2">Live Operational Graph</h3>
-              <p className="text-muted-foreground text-sm max-w-md leading-relaxed">
-                Track every flight, patient, or autonomous bot as a node on a massive, perfectly-synchronized directed graph. Millisecond latency, absolute truth.
-              </p>
-            </div>
-            
-            {/* Mock Graph Visual */}
-            <div className="mt-8 flex gap-4 opacity-50 group-hover:opacity-100 transition-opacity">
-               <div className="h-2 w-16 bg-primary rounded-full" />
-               <div className="h-2 w-32 bg-white/20 rounded-full" />
-               <div className="h-2 w-24 bg-white/20 rounded-full" />
-            </div>
-          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight font-sans text-white mb-6 leading-tight">
+            Built for physical scale
+          </h2>
+          <p className="text-xl text-white/50 leading-relaxed font-sans">
+            MatrixOS replaces fragmented dashboards with a single, unified operational graph powered by autonomous constraint engines.
+          </p>
         </motion.div>
 
-        {/* Bento Box 2: Small */}
+        {/* Right Column: CardSwap Animation Box */}
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-[#0A0A0C] border border-white/[0.05] rounded-3xl p-8 relative overflow-hidden group shadow-neu-inset hover:border-chart-4/30 transition-colors"
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="relative h-[450px] w-full flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-gradient-to-bl from-chart-4/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-          <div className="relative z-10 flex flex-col h-full justify-between min-h-[300px]">
-             <div>
-                <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center mb-6 text-foreground">
-                  <Lightning size={24} weight="duotone" />
+          <CardSwap
+            width={340}
+            height={240}
+            cardDistance={35}
+            verticalDistance={35}
+            delay={3000}
+            pauseOnHover={true}
+          >
+            {/* Card 1: Live Operational Graph */}
+            <Card className="p-8 flex flex-col justify-center text-sm border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.8)] backdrop-blur-xl bg-[#0A0A0C]/90">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 bg-primary/10 rounded-full">
+                  <Graph size={28} className="text-primary" />
                 </div>
-                <h3 className="text-xl font-bold font-sans text-foreground mb-2">Constraint Engine</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Every action is mathematically verified against physical invariants. No more double-booked gates or depleted resources.
-                </p>
-             </div>
-          </div>
-        </motion.div>
+                <span className="text-white font-sans text-xl font-bold">Live Operational Graph</span>
+              </div>
+              <p className="text-white/60 font-medium text-base leading-relaxed">
+                Track every flight, patient, or bot as a node on a massive, perfectly-synchronized directed graph. Millisecond latency.
+              </p>
+            </Card>
 
-        {/* Bento Box 3: Small */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="md:col-span-3 bg-[#0A0A0C] border border-white/[0.05] rounded-3xl p-8 md:p-12 relative overflow-hidden group shadow-neu-inset hover:border-chart-2/30 transition-colors"
-        >
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-chart-2/10 rounded-full blur-[100px] opacity-0 group-hover:opacity-50 transition-opacity duration-1000 -z-0 translate-x-1/3 -translate-y-1/3" />
-          <div className="relative z-10 md:w-1/2 flex flex-col justify-center h-full">
-            <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center mb-6 text-foreground">
-              <ChartLineUp size={24} weight="duotone" />
-            </div>
-            <h3 className="text-3xl font-bold font-sans text-foreground mb-4">Semantic Recovery</h3>
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              When a resource fails, the AI doesn't just alert you. It queries episodic memory, calculates semantic rerouting paths, mutates the operational graph, and dispatches the fix autonomously.
-            </p>
-          </div>
+            {/* Card 2: Constraint Engine */}
+            <Card className="p-8 flex flex-col justify-center text-sm border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.8)] backdrop-blur-xl bg-[#0A0A0C]/90">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 bg-chart-4/10 rounded-full">
+                  <Lightning size={28} className="text-chart-4" />
+                </div>
+                <span className="text-white font-sans text-xl font-bold">Constraint Engine</span>
+              </div>
+              <p className="text-white/60 font-medium text-base leading-relaxed">
+                Every action is mathematically verified against physical invariants. No more double-booked gates or depleted resources.
+              </p>
+            </Card>
+
+            {/* Card 3: Semantic Recovery */}
+            <Card className="p-8 flex flex-col justify-center text-sm border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.8)] backdrop-blur-xl bg-[#0A0A0C]/90">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="p-3 bg-chart-2/10 rounded-full">
+                  <ChartLineUp size={28} className="text-chart-2" />
+                </div>
+                <span className="text-white font-sans text-xl font-bold">Semantic Recovery</span>
+              </div>
+              <p className="text-white/60 font-medium text-base leading-relaxed">
+                When a resource fails, the AI queries episodic memory, calculates semantic rerouting paths, and dispatches the fix autonomously.
+              </p>
+            </Card>
+          </CardSwap>
         </motion.div>
 
       </div>
