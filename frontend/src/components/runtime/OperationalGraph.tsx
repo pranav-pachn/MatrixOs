@@ -138,7 +138,7 @@ export function OperationalGraph() {
         <h2 className="text-lg font-bold font-sans tracking-tight text-foreground">Operational Graph</h2>
         <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono mt-1">Auto-Layout Engine Active</p>
       </div>
-      
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -151,9 +151,9 @@ export function OperationalGraph() {
         proOptions={{ hideAttribution: true }} // Hides the default attribution for a cleaner OS look
       >
         <Background color="#434343" variant={BackgroundVariant.Dots} gap={24} size={2} />
-        
+
         {/* Sleek MiniMap for navigation */}
-        <MiniMap 
+        <MiniMap
           nodeColor={(node) => {
             if (node.type === "missionNode") return "#6C63FF";
             if (node.type === "resourceNode") return "#FF4D4D";
@@ -162,7 +162,7 @@ export function OperationalGraph() {
           maskColor="rgba(26, 26, 26, 0.7)"
           style={{ backgroundColor: "#292929", border: "1px solid #434343", borderRadius: "8px" }}
         />
-        
+
         <Controls className="fill-foreground bg-card border-border shadow-neu-raised rounded-md overflow-hidden" />
       </ReactFlow>
     </div>

@@ -12,21 +12,26 @@ export function WorldStatePanel() {
 
   return (
     <div className="flex flex-col h-full p-4 overflow-hidden">
-      <div className="mb-6">
-        <h2 className="text-lg font-bold font-sans tracking-tight text-foreground">World State</h2>
-        <p className="text-xs text-muted-foreground font-sans">Live operational telemetry</p>
+      <div className="mb-6 relative group">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-lg font-bold font-sans tracking-tight text-foreground">World State</h2>
+            <p className="text-xs text-muted-foreground font-sans">Live operational telemetry</p>
+          </div>
+          {/* Controls slot will go here */}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto pr-2 space-y-8 custom-scrollbar">
-        
+
         {/* UX Law: Miller's Law (Chunking) - Breaking dense data into manageable sections */}
-        
+
         <section>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground">Missions</h3>
             <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-foreground">{missions.length} Active</span>
           </div>
-          
+
           <div className="space-y-4">
             {missions.map((mission) => (
               <MissionCard key={mission.id} mission={mission} />
@@ -41,7 +46,7 @@ export function WorldStatePanel() {
             <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground">Resources</h3>
             <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-foreground">{resources.length} Tracked</span>
           </div>
-          
+
           <div className="space-y-3">
             {resources.map((res) => (
               <ResourceBadge key={res.id} name={res.name} type={res.type} status={res.status} />
