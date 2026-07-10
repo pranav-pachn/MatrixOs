@@ -15,11 +15,13 @@ class MissionStatus(str, Enum):
     recovered = 'recovered'
     diverged = 'diverged'
 
-class TaskStatus(str, Enum):
-    pending = 'pending'
-    active = 'active'
-    complete = 'complete'
-    rejected = 'rejected'
+class TaskState(str, Enum):
+    PENDING = 'PENDING'
+    READY = 'READY'
+    RUNNING = 'RUNNING'
+    FAILED = 'FAILED'
+    REPLANNED = 'REPLANNED'
+    COMPLETED = 'COMPLETED'
 
 class EventSeverity(str, Enum):
     info = 'info'
@@ -41,7 +43,7 @@ class Task(BaseModel):
     id: str
     name: str
     type: str
-    status: TaskStatus
+    status: TaskState
     duration: int
     assignedResourceId: Optional[str] = None
     dependencies: List[str] = []
@@ -147,3 +149,11 @@ class ConstraintRule(BaseModel):
 class ValidationResult(BaseModel):
     valid: bool
     errors: List[str]
+
+class RuntimeMetrics(BaseModel):
+    active_tasks: int
+    completed_tasks: int
+    failed_tasks: int
+    utilization: float
+    delay: int
+    throughput: int

@@ -19,53 +19,20 @@ export function MetricsBar() {
     <div className="h-20 w-full flex items-center border-t border-border bg-card/40 backdrop-blur-md overflow-x-auto overflow-y-hidden custom-scrollbar">
       <div className="flex flex-nowrap w-full divide-x divide-border/50 px-4">
         
-        <div className="flex-1 min-w-[200px]">
-          <MetricTile 
-            label="System Health" 
-            value={metrics.systemHealth.toString()} 
-            unit="%" 
-            trend={metrics.systemHealth >= 95 ? "up" : metrics.systemHealth < 80 ? "down" : "neutral"} 
-            goodTrend="up" 
-          />
-        </div>
-
-        <div className="flex-1 min-w-[200px]">
-          <MetricTile 
-            label="Active Constraints" 
-            value={metrics.activeConstraints.toString()} 
-            trend="neutral" 
-          />
-        </div>
-
-        <div className="flex-1 min-w-[200px]">
-          <MetricTile 
-            label="Divergence Rate" 
-            value={metrics.divergenceRate.toString()} 
-            unit="/hr" 
-            trend={metrics.divergenceRate > 1.5 ? "up" : "down"} 
-            goodTrend="down" 
-          />
-        </div>
-
-        <div className="flex-1 min-w-[200px]">
-          <MetricTile 
-            label="Recovery Latency" 
-            value={metrics.recoveryLatency.toString()} 
-            unit="ms" 
-            trend={metrics.recoveryLatency > 1000 ? "up" : "down"} 
-            goodTrend="down" 
-          />
-        </div>
-
-        <div className="flex-1 min-w-[200px]">
-          <MetricTile 
-            label="Resource Util" 
-            value={metrics.resourceUtilization.toString()} 
-            unit="%" 
-            trend={metrics.resourceUtilization > 90 ? "up" : "neutral"} 
-            goodTrend="down" 
-          />
-        </div>
+        {Array.isArray(metrics) ? metrics.map((metric: any, idx: number) => (
+          <div key={metric.key || idx} className="flex-1 min-w-[200px]">
+            <MetricTile 
+              label={metric.label} 
+              value={metric.value.toString()} 
+              unit={metric.unit || ""} 
+              trend="neutral" 
+            />
+          </div>
+        )) : (
+          <div className="flex-1 min-w-[200px]">
+            <span className="text-sm text-muted-foreground px-4">Invalid metrics format</span>
+          </div>
+        )}
 
       </div>
     </div>

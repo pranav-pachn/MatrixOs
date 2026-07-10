@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List, Optional, Any, Dict, Literal, Union
 from pydantic import BaseModel
 from .domain import (
@@ -16,6 +17,21 @@ class NewDivergenceEvent(WSEnvelope):
     message: str
     severity: EventSeverity
     divergence: Optional[Divergence] = None
+
+class RuntimePhase(str, Enum):
+    OBSERVING = "OBSERVING"
+    ASSESSING = "ASSESSING"
+    PLANNING = "PLANNING"
+    POLICY = "POLICY"
+    OPTIMIZING = "OPTIMIZING"
+    VALIDATING = "VALIDATING"
+    EXECUTING = "EXECUTING"
+
+class RuntimePhaseEvent(WSEnvelope):
+    event: Literal["runtime.phase.started", "runtime.phase.completed", "runtime.phase.failed"]
+    phase: RuntimePhase
+    message: str
+    duration: Optional[int] = None
 
 class AgentActionEvent(WSEnvelope):
     event: Literal["agent_action"] = "agent_action"
@@ -48,6 +64,7 @@ class DivergenceResolvedEvent(WSEnvelope):
 
 WSEventModel = Union[
     NewDivergenceEvent, 
+    RuntimePhaseEvent,
     AgentActionEvent, 
     RecoveryPlanEvent, 
     RecoveryStepUpdateEvent, 

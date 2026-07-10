@@ -1,5 +1,6 @@
 import React from "react";
 import { Header } from "@/components/layout/Header";
+import { TabBar } from "@/components/layout/TabBar";
 import { ScenarioInitializer } from "@/components/runtime/ScenarioInitializer";
 
 // This layout wraps all pages under /playground/[adapter]
@@ -23,6 +24,9 @@ export default async function AdapterLayout({
       
       {/* Brick 12: Header */}
       <Header adapterName={adapterName} status="LIVE" />
+      
+      {/* Navigation Tabs */}
+      <TabBar adapter={resolvedParams.adapter} />
       
       {/* Dashboard Content Area */}
       <div className="flex-1 overflow-hidden">

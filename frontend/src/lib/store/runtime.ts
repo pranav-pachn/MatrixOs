@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Mission, Resource, Divergence, Memory, RecoveryStep, Scenario, SystemMetrics, InvariantResult } from "@/types/runtime";
+import { Mission, Resource, Divergence, Memory, RecoveryStep, Scenario, SystemMetrics, InvariantResult, RuntimePhase, PhaseState } from "@/types/runtime";
 import { Node, Edge } from "@xyflow/react";
 
 import { airportScenario } from "../mock/airport";
@@ -18,10 +18,12 @@ interface RuntimeState {
   recovery: Scenario["recovery"];
   events: any[];
   
-  metrics: SystemMetrics | null;
+  metrics: any | null;
   invariants: InvariantResult[];
   isLoading: boolean;
   wsConnected: boolean;
+  
+  lifecycle: Record<RuntimePhase, PhaseState>;
   
   // Actions
   loadScenario: (scenarioId: string) => Promise<void>;
@@ -32,7 +34,10 @@ interface RuntimeState {
   setDivergences: (divergences: Divergence[]) => void;
   addEvent: (event: any) => void;
   
-  setMetrics: (metrics: SystemMetrics) => void;
+  setPhaseState: (phase: RuntimePhase, state: PhaseState) => void;
+  resetLifecycle: () => void;
+  
+  setMetrics: (metrics: any) => void;
   setInvariants: (invariants: InvariantResult[]) => void;
   setWsConnected: (connected: boolean) => void;
   updateRecoveryPlan: (recovery: Scenario["recovery"]) => void;
@@ -62,15 +67,27 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
   invariants: [],
   isLoading: false,
   wsConnected: false,
+  
+  lifecycle: {
+    OBSERVING: { status: "pending" },
+    ASSESSING: { status: "pending" },
+    PLANNING: { status: "pending" },
+    POLICY: { status: "pending" },
+    OPTIMIZING: { status: "pending" },
+    VALIDATING: { status: "pending" },
+    EXECUTING: { status: "pending" },
+    COMPLETED: { status: "pending" },
+    FAILED: { status: "pending" },
+  },
 
   loadScenario: async (scenarioId: string) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(`http://127.0.0.1:8001/api/scenarios/${scenarioId}/state`);
+      const response = await fetch(`http://127.0.0.1:8000/api/scenarios/${scenarioId}/state`);
       if (!response.ok) throw new Error("Failed to fetch scenario state");
       const scenario: Scenario = await response.json();
       
-      const metricsRes = await fetch(`http://127.0.0.1:8001/api/scenarios/${scenarioId}/metrics`);
+      const metricsRes = await fetch(`http://127.0.0.1:8000/api/scenarios/${scenarioId}/metrics`);
       let metrics = null;
       if (metricsRes.ok) {
         metrics = await metricsRes.json();
@@ -114,6 +131,26 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
   setEdges: (edges) => set({ edges }),
   setDivergences: (divergences) => set({ divergences }),
   addEvent: (event) => set((state) => ({ events: [event, ...state.events] })),
+  
+  setPhaseState: (phase, stateData) => set((state) => ({
+    lifecycle: {
+      ...state.lifecycle,
+      [phase]: stateData
+    }
+  })),
+  resetLifecycle: () => set({
+    lifecycle: {
+      OBSERVING: { status: "pending" },
+      ASSESSING: { status: "pending" },
+      PLANNING: { status: "pending" },
+      POLICY: { status: "pending" },
+      OPTIMIZING: { status: "pending" },
+      VALIDATING: { status: "pending" },
+      EXECUTING: { status: "pending" },
+      COMPLETED: { status: "pending" },
+      FAILED: { status: "pending" },
+    }
+  }),
   
   setMetrics: (metrics) => set({ metrics }),
   setInvariants: (invariants) => set({ invariants }),

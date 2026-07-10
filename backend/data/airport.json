@@ -14,7 +14,7 @@
           "id": "t1",
           "name": "Deboarding",
           "type": "pax",
-          "status": "complete",
+          "status": "COMPLETED",
           "duration": 15,
           "assignedResourceId": null,
           "dependencies": []
@@ -23,7 +23,7 @@
           "id": "t2",
           "name": "Fueling",
           "type": "fuel",
-          "status": "pending",
+          "status": "PENDING",
           "duration": 20,
           "assignedResourceId": null,
           "dependencies": []
@@ -42,7 +42,7 @@
           "id": "t1",
           "name": "Gate Assign",
           "type": "gate",
-          "status": "complete",
+          "status": "COMPLETED",
           "duration": 5,
           "assignedResourceId": null,
           "dependencies": []
@@ -51,7 +51,7 @@
           "id": "t2",
           "name": "Taxi",
           "type": "ground",
-          "status": "active",
+          "status": "RUNNING",
           "duration": 10,
           "assignedResourceId": null,
           "dependencies": []
@@ -60,7 +60,7 @@
           "id": "t3",
           "name": "Block In",
           "type": "ground",
-          "status": "pending",
+          "status": "PENDING",
           "duration": 2,
           "assignedResourceId": null,
           "dependencies": []

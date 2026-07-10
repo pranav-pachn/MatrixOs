@@ -7,7 +7,10 @@ from app.adapters.airport.events import get_events
 from app.adapters.airport.constraints import get_constraints, validate_state
 
 class AirportAdapter(BaseAdapter):
-    
+    def __init__(self):
+        super().__init__()
+        self.config.solver_timeout_seconds = 5
+        
     def load(self) -> Scenario:
         # Resolve path to backend/data/airport.json
         data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "data")
@@ -63,11 +66,24 @@ class AirportAdapter(BaseAdapter):
             AdapterMetric(key="flightsDelayed", value=3, unit="count", label="Flights Delayed")
         ]
 
+    def objectives(self) -> List[str]:
+        return [
+            "Minimize total gate delay",
+            "Preserve boarding safety windows",
+            "Maximize resource utilization",
+            "Minimize resource reassignment count"
+        ]
+
     def constraints(self) -> List[ConstraintRule]:
         return get_constraints()
 
     def events(self) -> List[AdapterEvent]:
         return get_events()
+        
+    def get_rules(self) -> List['BaseRule']:
+        from app.invariants.airport import get_airport_rules
+        return get_airport_rules()
+
         
     def evaluate_invariants(self, scenario: Scenario, actions: List[RecoveryAction]) -> List[InvariantResult]:
         validation = self.validate(scenario, actions)

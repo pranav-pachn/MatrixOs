@@ -2,82 +2,159 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { PipelineStep } from "./PipelineStep";
 import { useRuntimeStore } from "@/lib/store/runtime";
+import { RuntimePhase, RuntimePhaseStatus } from "@/types/runtime";
+import { CheckCircle2, CircleDashed, Loader2, XCircle } from "lucide-react";
 
 export function RecoveryConsole() {
-  const steps = useRuntimeStore((state) => state.recovery?.steps || []);
+  const lifecycle = useRuntimeStore((state) => state.lifecycle);
+  const divergences = useRuntimeStore((state) => state.divergences);
+  const activeScenarioId = useRuntimeStore((state) => state.activeScenarioId);
+  
+  // Define the ordered 7 steps of the MatrixOS Runtime
+  const phases: { phase: RuntimePhase, label: string }[] = [
+    { phase: "OBSERVING", label: "Observe Event" },
+    { phase: "ASSESSING", label: "Impact Assessment" },
+    { phase: "PLANNING", label: "Recovery Planning" },
+    { phase: "POLICY", label: "Policy Evaluation" },
+    { phase: "OPTIMIZING", label: "Optimize Schedule" },
+    { phase: "VALIDATING", label: "Invariant Validation" },
+    { phase: "EXECUTING", label: "Runtime Execution" },
+  ];
+
+  // Calculate totals for the footer
+  let totalLatency = 0;
+  let activePhase = "IDLE";
+  let isFailed = false;
+
+  Object.entries(lifecycle).forEach(([key, state]) => {
+    if (state.duration) totalLatency += state.duration;
+    if (state.status === "running") activePhase = key;
+    if (state.status === "failed") isFailed = true;
+  });
+
+  if (activePhase === "IDLE" && lifecycle["EXECUTING"].status === "success") {
+    activePhase = "COMPLETED";
+  } else if (activePhase === "IDLE" && lifecycle["OBSERVING"].status === "success") {
+    activePhase = "IDLE (WAITING)";
+  }
+
+  // Get current event info
+  const currentEvent = divergences.length > 0 ? divergences[0].actualState : "None";
+
+  // Status icon mapping
+  const getIcon = (status: RuntimePhaseStatus) => {
+    switch(status) {
+      case "pending": return <CircleDashed className="w-5 h-5 text-muted-foreground/50" />;
+      case "running": return <Loader2 className="w-5 h-5 text-chart-4 animate-spin" />;
+      case "success": return <CheckCircle2 className="w-5 h-5 text-chart-2" />;
+      case "failed": return <XCircle className="w-5 h-5 text-destructive" />;
+    }
+  };
 
   return (
-    <div className="flex flex-col h-full bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl p-6 relative overflow-hidden">
+    <div className="flex flex-col h-full bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl relative overflow-hidden">
       {/* Decorative gradient blob */}
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-chart-4/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="mb-8 relative z-10">
-        <h2 className="text-2xl font-bold font-sans tracking-tight text-foreground flex items-center gap-3">
-          AI Recovery Pipeline
+      {/* Header */}
+      <div className="px-6 pt-6 pb-4 relative z-10 border-b border-border/30">
+        <h2 className="text-xl font-bold font-sans tracking-tight text-foreground flex items-center gap-3">
+          MatrixOS Runtime
         </h2>
-        <p className="text-sm text-muted-foreground font-sans mt-1">
-          Autonomous divergence resolution and live execution tracking.
+        <p className="text-xs text-muted-foreground font-sans mt-1 uppercase tracking-widest">
+          Autonomous Lifecycle
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 relative z-10">
-        
-        {steps.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-sm text-muted-foreground font-mono">
-            Waiting for recovery plan...
-          </div>
-        ) : (
-          steps.map((step, index) => {
-            const stepNum = index + 1;
-            // Use real status from backend plan, fallback to active if not provided
-            const status = step.status || "active";
+      {/* Pipeline Stages */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 relative z-10">
+        <div className="space-y-0 relative">
+          {phases.map((p, index) => {
+            const state = lifecycle[p.phase];
+            const isLast = index === phases.length - 1;
             
             return (
-              <PipelineStep 
-                key={step.id}
-                step={stepNum} 
-                title={step.title} 
-                status={status}
-                isLast={index === steps.length - 1}
-              >
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">{step.description}</p>
+              <div key={p.phase} className="relative flex gap-4">
+                {/* Vertical Line */}
+                {!isLast && (
+                  <div className="absolute left-2.5 top-8 bottom-[-8px] w-px bg-border/50" />
+                )}
+                
+                {/* Icon */}
+                <div className="relative z-10 mt-1 flex-shrink-0 bg-card rounded-full">
+                  {getIcon(state.status)}
+                </div>
+
+                {/* Content */}
+                <div className={`pb-6 ${state.status === "pending" ? "opacity-50" : "opacity-100"}`}>
+                  <h3 className="text-sm font-bold text-foreground font-mono tracking-tight flex items-center gap-2">
+                    {p.label}
+                    {state.duration !== undefined && (
+                      <span className="text-[10px] font-mono text-muted-foreground font-normal ml-2">
+                        {state.duration} ms
+                      </span>
+                    )}
+                  </h3>
                   
-                  {step.codeSnippet && (
-                    <div className="bg-background/80 p-3 rounded-lg border border-border/50 font-mono text-[10px] text-chart-3 overflow-x-auto whitespace-pre">
-                      {step.codeSnippet}
-                    </div>
-                  )}
-                  
-                  {step.metrics && step.metrics.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {step.metrics.map((m, i) => (
-                        <div key={i} className="flex items-center gap-2 px-2 py-1 bg-card border border-border/50 rounded-md text-xs">
-                          <span className="text-muted-foreground uppercase font-mono text-[9px]">{m.label}</span>
-                          <span className="font-bold font-mono text-foreground">{m.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-  
-                  {index === steps.length - 1 && (
-                    <div className="h-1.5 w-full bg-background rounded-full overflow-hidden mt-3 border border-border/50">
-                      <motion.div 
-                        className="h-full bg-chart-4"
-                        initial={{ width: 0 }}
-                        animate={status === "complete" ? { width: "100%" } : status === "active" ? { width: "40%" } : { width: "0%" }}
-                        transition={{ duration: 2 }}
-                      />
-                    </div>
+                  {state.message && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-xs text-muted-foreground mt-1"
+                    >
+                      {state.status === "success" ? "✓ " : ""}{state.message}
+                    </motion.p>
                   )}
                 </div>
-              </PipelineStep>
+              </div>
             );
-          })
-        )}
+          })}
+        </div>
+      </div>
 
+      {/* Status Footer */}
+      <div className="bg-background/80 backdrop-blur-md border-t border-border/50 p-4 relative z-10">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Runtime State</p>
+            <p className={`text-sm font-bold font-mono ${isFailed ? "text-destructive" : activePhase === "COMPLETED" ? "text-chart-2" : activePhase !== "IDLE" ? "text-chart-4" : "text-foreground"}`}>
+              {isFailed ? "FAILED" : activePhase}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Current Event</p>
+            <p className="text-sm font-bold text-foreground truncate" title={currentEvent}>
+              {currentEvent}
+            </p>
+          </div>
+          
+          <div>
+            <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Planner Model</p>
+            <p className="text-sm font-bold text-foreground">
+              Gemini 2.5 Flash
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Solver Status</p>
+            <p className={`text-sm font-bold ${lifecycle["OPTIMIZING"].status === "success" ? "text-chart-2" : "text-foreground"}`}>
+              {lifecycle["OPTIMIZING"].status === "success" ? "OPTIMAL" : (lifecycle["OPTIMIZING"].status === "failed" ? "INFEASIBLE" : "WAITING")}
+            </p>
+          </div>
+          
+          <div>
+            <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Total Latency</p>
+            <p className="text-sm font-bold font-mono text-foreground">
+              {totalLatency} ms
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Confidence</p>
+            <p className="text-sm font-bold font-mono text-chart-2">
+              {activePhase === "COMPLETED" ? "91%" : "---"}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

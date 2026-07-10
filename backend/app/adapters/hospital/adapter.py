@@ -7,7 +7,10 @@ from app.adapters.hospital.events import get_events
 from app.adapters.hospital.constraints import get_constraints, validate_state
 
 class HospitalAdapter(BaseAdapter):
-    
+    def __init__(self):
+        super().__init__()
+        self.config.solver_timeout_seconds = 3
+        
     def load(self) -> Scenario:
         data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "data")
         file_path = os.path.join(data_dir, "hospital-er.json")
@@ -54,11 +57,23 @@ class HospitalAdapter(BaseAdapter):
             AdapterMetric(key="surgeryDelay", value=15.0, unit="mins", label="Surgery Delay")
         ]
 
+    def objectives(self) -> List[str]:
+        return [
+            "Minimize patient wait time",
+            "Ensure critical patients are treated immediately",
+            "Maximize bed and staff utilization"
+        ]
+
     def constraints(self) -> List[ConstraintRule]:
         return get_constraints()
 
     def events(self) -> List[AdapterEvent]:
         return get_events()
+
+    def get_rules(self) -> List['BaseRule']:
+        from app.invariants.hospital import get_hospital_rules
+        return get_hospital_rules()
+
         
     def evaluate_invariants(self, scenario: Scenario, actions: List[RecoveryAction]) -> List[InvariantResult]:
         validation = self.validate(scenario, actions)

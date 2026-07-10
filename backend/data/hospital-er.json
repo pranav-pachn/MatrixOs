@@ -14,7 +14,7 @@
           "id": "t1",
           "name": "Triage Assessment",
           "type": "medical",
-          "status": "complete",
+          "status": "COMPLETED",
           "duration": 5,
           "assignedResourceId": null,
           "dependencies": []
@@ -23,7 +23,7 @@
           "id": "t2",
           "name": "CT Scan",
           "type": "imaging",
-          "status": "pending",
+          "status": "PENDING",
           "duration": 15,
           "assignedResourceId": null,
           "dependencies": [
@@ -44,7 +44,7 @@
           "id": "t1",
           "name": "Bay Assign",
           "type": "logistics",
-          "status": "complete",
+          "status": "COMPLETED",
           "duration": 2,
           "assignedResourceId": null,
           "dependencies": []
@@ -53,7 +53,7 @@
           "id": "t2",
           "name": "Patient Transfer",
           "type": "medical",
-          "status": "active",
+          "status": "RUNNING",
           "duration": 5,
           "assignedResourceId": null,
           "dependencies": [

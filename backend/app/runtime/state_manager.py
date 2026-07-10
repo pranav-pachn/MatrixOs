@@ -3,7 +3,7 @@ import os
 import asyncio
 from typing import Dict, Optional, List
 from fastapi import HTTPException
-from app.models.domain import Scenario, Resource, Mission, Task, Divergence, Memory, Status, MissionStatus, TaskStatus
+from app.models.domain import Scenario, Resource, Mission, Task, Divergence, Memory, Status, MissionStatus, TaskState
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data")
 
@@ -69,7 +69,7 @@ class RuntimeStateManager:
                     return res
             return None
 
-    async def update_task(self, scenario_id: str, task_id: str, status: Optional[TaskStatus] = None, assigned_resource_id: Optional[str] = None) -> Optional[Task]:
+    async def update_task(self, scenario_id: str, task_id: str, status: Optional[TaskState] = None, assigned_resource_id: Optional[str] = None) -> Optional[Task]:
         async with self._get_lock(scenario_id):
             scenario = self.scenarios.get(scenario_id)
             if not scenario: return None

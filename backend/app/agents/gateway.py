@@ -49,7 +49,7 @@ class LLMGateway:
             env_keys.get("GEMINI_API_KEY", []),
             "https://generativelanguage.googleapis.com/v1beta/openai/"
         )
-        self.gemini_model = "gemini-2.5-flash"
+        self.gemini_model = "gemini-2.0-flash"
 
         # 2. DeepSeek via NVIDIA (Planning / Reasoning)
         self.deepseek_clients = create_clients(

@@ -46,7 +46,7 @@ The product relies on three core concepts:
 The common runtime language across all domains (Missions, Tasks, Resources, Constraints).
 
 ### 5.2 Invariant Engine
-The system's moat. A deterministic engine that ensures no AI action violates operational rules. Invariants are supplied by the Domain Adapter and encode immutable operational rules defined by domain experts.
+The system's moat. A deterministic engine that ensures no AI action violates operational rules. Invariants are supplied by the Domain Adapter and encode immutable operational rules defined by domain experts. Adapters expose two rule views: `constraints()` for UI labels and `get_rules()` for executable runtime validation. The engine evaluates all `BaseRule` instances without short-circuiting, so every violation is reported in a single pass.
 
 ### 5.3 Recovery Intelligence
 The capability to assess disruption impact, select a recovery path, and store outcomes in **Recovery Memory** to improve future responses.

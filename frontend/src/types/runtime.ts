@@ -100,6 +100,26 @@ export interface RecoveryStep {
   duration?: number;
 }
 
+export type RuntimePhase =
+  | "OBSERVING"
+  | "ASSESSING"
+  | "PLANNING"
+  | "POLICY"
+  | "OPTIMIZING"
+  | "VALIDATING"
+  | "EXECUTING"
+  | "COMPLETED"
+  | "FAILED";
+
+export type RuntimePhaseStatus = "pending" | "running" | "success" | "failed";
+
+export interface PhaseState {
+  status: RuntimePhaseStatus;
+  message?: string;
+  duration?: number;
+}
+
+
 export interface Scenario {
   id: string;
   name: string;

@@ -7,7 +7,10 @@ from app.adapters.warehouse.events import get_events
 from app.adapters.warehouse.constraints import get_constraints, validate_state
 
 class WarehouseAdapter(BaseAdapter):
-    
+    def __init__(self):
+        super().__init__()
+        self.config.solver_timeout_seconds = 10
+        
     def load(self) -> Scenario:
         data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "data")
         file_path = os.path.join(data_dir, "warehouse-hub.json")
@@ -54,11 +57,23 @@ class WarehouseAdapter(BaseAdapter):
             AdapterMetric(key="inventoryAccuracy", value=99.8, unit="%", label="Inventory Accuracy")
         ]
 
+    def objectives(self) -> List[str]:
+        return [
+            "Maximize order fulfillment throughput",
+            "Minimize loading dock delays",
+            "Optimize robotic fleet utilization"
+        ]
+
     def constraints(self) -> List[ConstraintRule]:
         return get_constraints()
 
     def events(self) -> List[AdapterEvent]:
         return get_events()
+
+    def get_rules(self) -> List['BaseRule']:
+        from app.invariants.warehouse import get_warehouse_rules
+        return get_warehouse_rules()
+
         
     def evaluate_invariants(self, scenario: Scenario, actions: List[RecoveryAction]) -> List[InvariantResult]:
         validation = self.validate(scenario, actions)

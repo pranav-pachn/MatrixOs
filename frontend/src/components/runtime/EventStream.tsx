@@ -32,7 +32,7 @@ export function EventStream() {
     const connect = () => {
       if (wsRef.current?.readyState === WebSocket.OPEN) return;
       
-      const ws = new WebSocket(`ws://127.0.0.1:8001/ws/runtime/${activeScenarioId}`);
+      const ws = new WebSocket(`ws://127.0.0.1:8000/ws/runtime/${activeScenarioId}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -54,6 +54,8 @@ export function EventStream() {
           const data = JSON.parse(event.data);
           
           if (data.event === "new_divergence") {
+            // Also reset lifecycle when a new divergence happens
+            useRuntimeStore.getState().resetLifecycle();
             addEvent({
               id: data.eventId,
               type: "divergence",
@@ -62,6 +64,29 @@ export function EventStream() {
               description: data.message
             });
           } 
+          else if (data.event.startsWith("runtime.phase.")) {
+            const status = data.event.split(".")[2]; // started, completed, failed
+            
+            // Map the backend status to frontend RuntimePhaseStatus
+            let mappedStatus = "running";
+            if (status === "completed") mappedStatus = "success";
+            if (status === "failed") mappedStatus = "failed";
+            if (status === "started") mappedStatus = "running";
+
+            useRuntimeStore.getState().setPhaseState(data.phase, {
+              status: mappedStatus as any,
+              message: data.message,
+              duration: data.duration
+            });
+
+            addEvent({
+              id: `evt-${crypto.randomUUID()}`,
+              type: "agent_action",
+              timestamp: data.timestamp,
+              severity: status === "failed" ? "critical" : "info",
+              description: `[${data.phase}] ${data.message}`
+            });
+          }
           else if (data.event === "agent_action") {
             addEvent({
               id: `evt-${crypto.randomUUID()}`,

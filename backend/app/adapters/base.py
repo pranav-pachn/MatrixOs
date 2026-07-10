@@ -1,8 +1,16 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
+from pydantic import BaseModel
 from app.models.domain import Scenario, RecoveryAction, InvariantResult, ValidationResult, AdapterMetric, ConstraintRule, AdapterEvent
+from app.invariants.base_rule import BaseRule
+
+class AdapterConfig(BaseModel):
+    solver_timeout_seconds: int = 5
 
 class BaseAdapter(ABC):
+    def __init__(self):
+        self.config = AdapterConfig()
+
     @abstractmethod
     def load(self) -> Scenario:
         """Initialize and return the world state scenario."""
@@ -31,6 +39,16 @@ class BaseAdapter(ABC):
     @abstractmethod
     def events(self) -> List[AdapterEvent]:
         """Return the possible event types for this domain."""
+        pass
+
+    @abstractmethod
+    def objectives(self) -> List[str]:
+        """Return the objectives for this domain."""
+        pass
+
+    @abstractmethod
+    def get_rules(self) -> List[BaseRule]:
+        """Return the domain-specific invariant rules for this adapter."""
         pass
 
     # Kept for backward compatibility -- calls validate internally or can be overridden

@@ -14,7 +14,7 @@
           "id": "t1",
           "name": "Pallet Picking",
           "type": "logistics",
-          "status": "complete",
+          "status": "COMPLETED",
           "duration": 25,
           "assignedResourceId": null,
           "dependencies": []
@@ -23,7 +23,7 @@
           "id": "t2",
           "name": "Dock Loading",
           "type": "loading",
-          "status": "pending",
+          "status": "PENDING",
           "duration": 15,
           "assignedResourceId": null,
           "dependencies": [
@@ -44,7 +44,7 @@
           "id": "t1",
           "name": "Unload",
           "type": "loading",
-          "status": "complete",
+          "status": "COMPLETED",
           "duration": 10,
           "assignedResourceId": null,
           "dependencies": []
@@ -53,7 +53,7 @@
           "id": "t2",
           "name": "Sort",
           "type": "logistics",
-          "status": "active",
+          "status": "RUNNING",
           "duration": 30,
           "assignedResourceId": null,
           "dependencies": [
