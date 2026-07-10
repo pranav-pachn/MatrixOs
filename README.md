@@ -140,7 +140,7 @@ Standard frameworks orchestrate LLM calls. MatrixOS acts as a protective kernel 
 
 ## Database
 
-- SQLite (Hackathon MVP)
+- SQLite 
 
 ## Deployment
 
