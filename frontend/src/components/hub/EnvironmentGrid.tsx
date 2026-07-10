@@ -21,7 +21,6 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { AddEnvironmentCard } from "./AddEnvironmentCard";
-import { AddEnvironmentModal, type NewEnvironment } from "./AddEnvironmentModal";
 
 // Icon renderer — maps key string → JSX
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -141,21 +140,6 @@ function EnvironmentCard({ env, onDelete }: { env: Environment; onDelete?: () =>
 
 export function EnvironmentGrid() {
   const [environments, setEnvironments] = useState<Environment[]>(DEFAULT_ENVIRONMENTS);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleAdd = (newEnv: NewEnvironment) => {
-    const slug = slugify(newEnv.name);
-    const env: Environment = {
-      id: slug + "-" + Date.now(),
-      name: newEnv.name,
-      description: newEnv.description,
-      iconKey: newEnv.iconKey,
-      status: newEnv.status,
-      href: `/playground/${slug}`,
-      isDefault: false,
-    };
-    setEnvironments((prev) => [...prev, env]);
-  };
 
   const handleDelete = (id: string) => {
     setEnvironments((prev) => prev.filter((e) => e.id !== id));
@@ -183,14 +167,16 @@ export function EnvironmentGrid() {
           ))}
         </AnimatePresence>
 
-        {/* Add card — always at the end, staggered after environments */}
+        {/* Add card — links to the new full-page creation experience */}
         <motion.div 
           layout 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: environments.length * 0.15, ease: [0.16, 1, 0.3, 1] }}
         >
-          <AddEnvironmentCard onClick={() => setIsModalOpen(true)} />
+          <Link href="/runtime/new-environment" className="block h-full">
+            <AddEnvironmentCard onClick={() => {}} />
+          </Link>
         </motion.div>
       </div>
 
@@ -231,11 +217,6 @@ export function EnvironmentGrid() {
         </div>
       </motion.div>
 
-      <AddEnvironmentModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAdd={handleAdd}
-      />
     </>
   );
 }

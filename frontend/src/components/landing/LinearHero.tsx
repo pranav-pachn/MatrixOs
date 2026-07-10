@@ -1,26 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import Link from "next/link";
 
 export function LinearHero() {
-  const [showFirstStroke, setShowFirstStroke] = useState(false);
-  const [showSecondStroke, setShowSecondStroke] = useState(false);
-
-  useEffect(() => {
-    // 0.8s initial delay for the first word
-    const t1 = setTimeout(() => setShowFirstStroke(true), 800);
-    // Wait exactly 1.5s after the first animation starts
-    const t2 = setTimeout(() => setShowSecondStroke(true), 2300); 
-
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, []);
   return (
     <div className="relative pt-32 pb-20 md:pt-48 md:pb-32 flex flex-col items-center justify-center text-center overflow-hidden min-h-[600px]">
       
@@ -34,10 +20,9 @@ export function LinearHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="inline-flex items-center space-x-2 bg-white/[0.03] border border-white/10 rounded-full px-3 py-1 mb-8 backdrop-blur-md"
+          className="mb-8 pointer-events-auto"
         >
-          <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-medium tracking-wide text-white/70">MatrixOS v1.0 Preview</span>
+          <StatusBadge status="preview" label="Developer Preview" />
         </motion.div>
 
         <motion.h1 
@@ -49,27 +34,46 @@ export function LinearHero() {
           The{" "}
           <span className="relative inline-block text-white">
             operational
-            <div className="absolute top-[100%] left-0 w-full -translate-y-1/2 pointer-events-none opacity-90 z-[-1]">
-              {showFirstStroke && (
-                <DotLottieReact
-                  src="https://lottie.host/460d4f58-ebfd-4857-ac30-1063957b195c/VhrfWC6MQv.json"
-                  loop
-                  autoplay
+            <div className="absolute top-full left-[5%] w-[90%] h-4 -mt-2 md:-mt-1 pointer-events-none z-[-1] text-[#cc5a37]">
+              <svg 
+                className="w-full h-full" 
+                viewBox="0 0 100 20" 
+                preserveAspectRatio="none"
+                fill="none" 
+              >
+                <motion.path
+                  d="M 2 12 Q 30 16 60 10 T 98 11"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 0.85 }}
+                  transition={{ duration: 0.7, delay: 0.8, ease: "easeInOut" }}
                 />
-              )}
+              </svg>
             </div>
           </span>{" "}
           <br className="hidden md:block" />
           <span className="relative inline-block text-white">
             runtime
-            <div className="absolute top-[100%] left-0 w-full -translate-y-1/2 pointer-events-none opacity-90 z-[-1]">
-              {showSecondStroke && (
-                <DotLottieReact
-                  src="https://lottie.host/460d4f58-ebfd-4857-ac30-1063957b195c/VhrfWC6MQv.json"
-                  loop
-                  autoplay
+            <div className="absolute top-full left-[7.5%] w-[85%] h-4 -mt-2 md:-mt-1 pointer-events-none z-[-1] text-[#cc5a37]">
+              <svg 
+                className="w-full h-full" 
+                viewBox="0 0 100 20" 
+                preserveAspectRatio="none"
+                fill="none" 
+              >
+                <motion.path
+                  d="M 3 10 Q 40 14 70 9 T 97 10"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 0.85 }}
+                  // 0.8 (initial delay) + 0.7 (first anim) + 1.5 (wait) = 3.0s delay
+                  transition={{ duration: 0.7, delay: 3.0, ease: "easeInOut" }}
                 />
-              )}
+              </svg>
             </div>
           </span>{" "}
           for reality
