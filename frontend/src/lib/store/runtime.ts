@@ -108,7 +108,7 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
         isLoading: false
       });
     } catch (error) {
-      console.error("Error loading scenario from backend:", error);
+      console.warn("Backend unavailable, falling back to local mocks.");
       // Fallback to local mocks if backend fails
       const scenario = scenarios[scenarioId] || airportScenario;
       set({

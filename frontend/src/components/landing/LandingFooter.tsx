@@ -45,11 +45,11 @@ export function LandingFooter() {
           
           {/* Left: Brand */}
           <div className="md:col-span-1 flex flex-col items-start">
-            <Link href="/" className="group mb-6 inline-block">
+            <div className="group mb-6 inline-block">
               <div className="transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(108,99,255,0.4)]">
                 <MatrixLogo className="scale-90 origin-left" />
               </div>
-            </Link>
+            </div>
             <p className="text-[15px] text-white/50 leading-relaxed font-sans mb-4">
               The operational runtime for real-world systems.
             </p>
