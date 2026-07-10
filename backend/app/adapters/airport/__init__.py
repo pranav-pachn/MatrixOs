@@ -1,0 +1,1 @@
+# Airport domain adapter package

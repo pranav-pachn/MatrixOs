@@ -1,9 +1,8 @@
 import asyncio
 from typing import Dict, Any, List
 from app.models.domain import Scenario, RecoveryAction, InvariantResult, ActionType, ValidationStatus
-from app.adapters.base import BaseAdapter
-from app.adapters.airport import AirportAdapter
 from app.agents.gateway import gateway
+from app.adapters.registry import get as get_adapter
 
 class RecoveryAgent:
     def __init__(self):
@@ -17,15 +16,13 @@ class RecoveryAgent:
 
 class InvariantEngine:
     def __init__(self):
-        self.adapters = {
-            "airport": AirportAdapter(),
-        }
+        pass
 
     async def validate(self, scenario_id: str, scenario: Scenario, actions: List[RecoveryAction]) -> List[InvariantResult]:
         """Deterministic invariant validation using Domain Adapter"""
         await asyncio.sleep(0.5)
         
-        adapter = self.adapters.get(scenario_id)
+        adapter = get_adapter(scenario_id)
         if not adapter:
             return [InvariantResult(status=ValidationStatus.PASS, constraint="No adapter", reason="Fallback pass")]
             

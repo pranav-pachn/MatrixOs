@@ -32,15 +32,23 @@ class RuntimeStateManager:
     async def get_scenario(self, scenario_id: str) -> Scenario:
         async with self._get_lock(scenario_id):
             if scenario_id not in self.scenarios:
-                file_path = os.path.join(DATA_DIR, f"{scenario_id}.json")
-                if not os.path.exists(file_path):
-                    raise HTTPException(status_code=404, detail=f"Scenario {scenario_id} not found in data dir")
-                
-                with open(file_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    self.scenarios[scenario_id] = Scenario.model_validate(data)
+                from app.adapters.registry import get as get_adapter
+                adapter = get_adapter(scenario_id)
+                if adapter:
+                    self.scenarios[scenario_id] = adapter.load()
+                else:
+                    file_path = os.path.join(DATA_DIR, f"{scenario_id}.json")
+                    if not os.path.exists(file_path):
+                        raise HTTPException(status_code=404, detail=f"Scenario {scenario_id} not found in data dir")
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        self.scenarios[scenario_id] = Scenario.model_validate(data)
             self.active_scenario_id = scenario_id
             return self.scenarios[scenario_id]
+
+    async def apply_recovery_actions(self, scenario_id: str, new_state: Scenario):
+        async with self._get_lock(scenario_id):
+            self.scenarios[scenario_id] = new_state
 
     async def get_active_scenario(self) -> Optional[Scenario]:
         if not self.active_scenario_id:

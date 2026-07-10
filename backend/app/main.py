@@ -5,10 +5,13 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.models.events import AdapterModel, InjectEventRequest, InjectEventResponse, NewDivergenceEvent, Divergence
-from app.models.domain import Scenario, SystemMetrics
+from app.models.domain import Scenario, SystemMetrics, AdapterMetric, ConstraintRule, AdapterEvent
 from app.runtime.state_manager import state_manager
 from app.websocket.manager import manager
 from app.events.bus import event_bus
+from app.adapters.loader import load_all_adapters
+from app.adapters.registry import get as get_adapter
+from typing import Dict, Any
 
 app = FastAPI(title="MatrixOS Backend - Foundation")
 
@@ -19,6 +22,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup_event():
+    load_all_adapters()
 
 ALLOWED_SCENARIOS = ["airport", "hospital-er", "warehouse-hub"]
 
@@ -54,18 +61,38 @@ async def get_world_state(scenario_id: str):
         raise HTTPException(status_code=400, detail="Invalid scenario ID")
     return await state_manager.get_scenario(scenario_id)
 
-@app.get("/api/scenarios/{scenario_id}/metrics", response_model=SystemMetrics)
+@app.get("/api/scenarios/{scenario_id}/metrics", response_model=List[AdapterMetric])
 async def get_metrics(scenario_id: str):
     if scenario_id not in ALLOWED_SCENARIOS:
         raise HTTPException(status_code=400, detail="Invalid scenario ID")
-    # For Phase 0, we can just return a dummy SystemMetrics 
-    return SystemMetrics(
-        systemHealth=100.0,
-        activeConstraints=0,
-        divergenceRate=0.0,
-        recoveryLatency=0.0,
-        resourceUtilization=50.0
-    )
+    adapter = get_adapter(scenario_id)
+    if not adapter:
+        raise HTTPException(status_code=404, detail="Adapter not found")
+    return adapter.metrics()
+
+@app.get("/api/scenarios/{scenario_id}/constraints", response_model=List[ConstraintRule])
+async def get_constraints(scenario_id: str):
+    adapter = get_adapter(scenario_id)
+    if not adapter:
+        raise HTTPException(status_code=404, detail="Adapter not found")
+    return adapter.constraints()
+
+@app.get("/api/scenarios/{scenario_id}/events", response_model=List[AdapterEvent])
+async def get_events(scenario_id: str):
+    adapter = get_adapter(scenario_id)
+    if not adapter:
+        raise HTTPException(status_code=404, detail="Adapter not found")
+    return adapter.events()
+
+@app.post("/api/scenarios/{scenario_id}/execute", response_model=Scenario)
+async def execute_plan(scenario_id: str, plan: Dict[str, Any]):
+    adapter = get_adapter(scenario_id)
+    if not adapter:
+        raise HTTPException(status_code=404, detail="Adapter not found")
+    current_state = await state_manager.get_scenario(scenario_id)
+    new_state = adapter.execute(plan, current_state)
+    await state_manager.apply_recovery_actions(scenario_id, new_state)
+    return new_state
 
 @app.get("/health")
 async def health_check():

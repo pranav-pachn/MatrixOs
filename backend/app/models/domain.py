@@ -126,3 +126,24 @@ class RecoveryAction(BaseModel):
     new_value: Any = None
     source_node: Optional[str] = None
     target_node: Optional[str] = None
+
+class AdapterMetric(BaseModel):
+    key: str
+    value: float
+    unit: str
+    label: str
+
+class AdapterEvent(BaseModel):
+    id: str
+    type: str
+    severity: EventSeverity
+    description: str
+
+class ConstraintRule(BaseModel):
+    id: str
+    description: str
+    is_active: bool
+
+class ValidationResult(BaseModel):
+    valid: bool
+    errors: List[str]
