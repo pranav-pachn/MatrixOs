@@ -87,7 +87,7 @@ const CardSwap = ({
   const order = useRef(Array.from({ length: childArr.length }, (_, i) => i));
 
   const tlRef = useRef<gsap.core.Timeline | null>(null);
-  const intervalRef = useRef<number | undefined>();
+  const intervalRef = useRef<number | undefined>(undefined);
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -177,19 +177,21 @@ const CardSwap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing]);
 
-  const rendered = childArr.map((child, i) =>
-    isValidElement(child)
-      ? cloneElement(child as React.ReactElement<any>, {
-          key: i,
-          ref: refs[i],
-          style: { width, height, ...(child.props.style ?? {}) },
-          onClick: (e: any) => {
-            child.props.onClick?.(e);
-            onCardClick?.(i);
-          }
-        })
-      : child
-  );
+  const rendered = childArr.map((child, i) => {
+    if (isValidElement(child)) {
+      const element = child as React.ReactElement<any>;
+      return cloneElement(element, {
+        key: i,
+        ref: refs[i],
+        style: { width, height, ...(element.props.style ?? {}) },
+        onClick: (e: any) => {
+          element.props.onClick?.(e);
+          onCardClick?.(i);
+        }
+      });
+    }
+    return child;
+  });
 
   return (
     <div ref={container} className="card-swap-container" style={{ width, height }}>

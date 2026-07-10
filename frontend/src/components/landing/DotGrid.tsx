@@ -172,15 +172,17 @@ const DotGrid = ({
   useEffect(() => {
     buildGrid();
     let ro: ResizeObserver | null = null;
-    if ('ResizeObserver' in window) {
+    if (typeof window !== 'undefined' && 'ResizeObserver' in window) {
       ro = new ResizeObserver(buildGrid);
       wrapperRef.current && ro.observe(wrapperRef.current);
-    } else {
-      window.addEventListener('resize', buildGrid);
+    } else if (typeof window !== 'undefined') {
+      (window as any).addEventListener('resize', buildGrid);
     }
     return () => {
       if (ro) ro.disconnect();
-      else window.removeEventListener('resize', buildGrid);
+      else if (typeof window !== 'undefined') {
+        (window as any).removeEventListener('resize', buildGrid);
+      }
     };
   }, [buildGrid]);
 
