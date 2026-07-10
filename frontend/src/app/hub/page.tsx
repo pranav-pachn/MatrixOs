@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { EnvironmentGrid } from "@/components/hub/EnvironmentGrid";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { MatrixLogo } from "@/components/ui/MatrixLogo";
 
 export default function HubPage() {
@@ -29,9 +30,8 @@ export default function HubPage() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center space-x-2 border border-white/10 bg-white/[0.04] rounded-full px-4 py-1.5 text-xs text-white/40 font-mono uppercase tracking-widest mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span>Operational Runtime</span>
+          <div className="mb-5">
+            <StatusBadge status="runtime" label="Runtime Hub" />
           </div>
           <h1 className="text-5xl md:text-6xl font-bold tracking-tighter text-white font-sans mb-4">
             Active Environments

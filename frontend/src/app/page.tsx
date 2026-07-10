@@ -3,7 +3,7 @@ import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LinearHero } from "@/components/landing/LinearHero";
 import { BentoGrid } from "@/components/landing/BentoGrid";
 import { LogoStrip } from "@/components/landing/LogoStrip";
-import { CtaSection } from "@/components/landing/CtaSection";
+import { LandingFooter } from "@/components/landing/LandingFooter";
 import DotGrid from "@/components/landing/DotGrid";
 import { MatrixLogo } from "@/components/ui/MatrixLogo";
 
@@ -42,20 +42,10 @@ export default function Home() {
           <BentoGrid />
         </div>
 
-        {/* 5. Bottom CTA */}
-        <CtaSection />
-
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/5 py-12 text-center">
-        <div className="flex items-center justify-center mb-6">
-          <MatrixLogo className="scale-90 opacity-50 hover:opacity-100 transition-opacity duration-300" />
-        </div>
-        <p className="text-sm text-muted-foreground font-mono uppercase tracking-widest">
-          SYSTEM ONLINE • v1.0.0
-        </p>
-      </footer>
+      {/* Unified Footer & CTA */}
+      <LandingFooter />
     </div>
   );
 }

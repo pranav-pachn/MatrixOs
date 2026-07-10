@@ -3,7 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import Link from "next/link";
 
 export function LinearHero() {
@@ -20,10 +20,9 @@ export function LinearHero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="inline-flex items-center space-x-2 bg-white/[0.03] border border-white/10 rounded-full px-3 py-1 mb-8 backdrop-blur-md"
+          className="mb-8 pointer-events-auto"
         >
-          <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-xs font-medium tracking-wide text-white/70">MatrixOS v1.0 Preview</span>
+          <StatusBadge status="preview" label="Developer Preview" />
         </motion.div>
 
         <motion.h1 

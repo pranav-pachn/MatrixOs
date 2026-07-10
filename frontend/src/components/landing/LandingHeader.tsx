@@ -4,9 +4,13 @@ import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, List } from "@phosphor-icons/react/dist/ssr";
+import { usePathname } from "next/navigation";
 import { MatrixLogo } from "@/components/ui/MatrixLogo";
 
 export function LandingHeader() {
+  const pathname = usePathname();
+  const isDocs = pathname?.startsWith("/documentation");
+
   return (
     <motion.header 
       initial={{ y: -40, opacity: 0 }}
@@ -23,12 +27,19 @@ export function LandingHeader() {
 
         {/* Center Nav (Hidden on Mobile) */}
         <nav className="hidden lg:flex items-center space-x-12 relative">
-          <div className="relative">
-            <Link href="/" className="text-[14px] font-medium text-white transition-colors duration-[250ms] tracking-wide">Runtime</Link>
-            <div className="absolute -bottom-[14px] left-0 right-0 h-[2px] bg-primary rounded-t-full shadow-[0_-2px_10px_rgba(122,60,249,0.5)]" />
+          <div className="relative group">
+            <Link href="/" className={`text-[14px] font-medium transition-colors duration-[250ms] tracking-wide ${!isDocs ? "text-white" : "text-[#B8B8C2] group-hover:text-white"}`}>Runtime</Link>
+            {!isDocs && (
+              <motion.div layoutId="nav-indicator" className="absolute -bottom-[14px] left-0 right-0 h-[2px] bg-primary rounded-t-full shadow-[0_-2px_10px_rgba(122,60,249,0.5)]" />
+            )}
           </div>
           <Link href="#" className="text-[14px] font-medium text-[#B8B8C2] hover:text-white transition-colors duration-[250ms] tracking-wide">Methodology</Link>
-          <Link href="/documentation" className="text-[14px] font-medium text-[#B8B8C2] hover:text-white transition-colors duration-[250ms] tracking-wide">Documentation</Link>
+          <div className="relative group">
+            <Link href="/documentation/getting-started" className={`text-[14px] font-medium transition-colors duration-[250ms] tracking-wide ${isDocs ? "text-white" : "text-[#B8B8C2] group-hover:text-white"}`}>Documentation</Link>
+            {isDocs && (
+              <motion.div layoutId="nav-indicator" className="absolute -bottom-[14px] left-0 right-0 h-[2px] bg-primary rounded-t-full shadow-[0_-2px_10px_rgba(122,60,249,0.5)]" />
+            )}
+          </div>
         </nav>
 
         {/* Actions */}
