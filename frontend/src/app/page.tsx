@@ -5,6 +5,7 @@ import { BentoGrid } from "@/components/landing/BentoGrid";
 import { LogoStrip } from "@/components/landing/LogoStrip";
 import { CtaSection } from "@/components/landing/CtaSection";
 import DotGrid from "@/components/landing/DotGrid";
+import { MatrixLogo } from "@/components/ui/MatrixLogo";
 
 export default function Home() {
   return (
@@ -48,11 +49,8 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-white/5 py-12 text-center">
-        <div className="flex items-center justify-center space-x-2 opacity-50 mb-4">
-          <div className="w-4 h-4 rounded bg-foreground flex items-center justify-center">
-            <div className="w-2 h-2 rounded-sm bg-background" />
-          </div>
-          <span className="font-bold tracking-tight">MatrixOS</span>
+        <div className="flex items-center justify-center mb-6">
+          <MatrixLogo className="scale-90 opacity-50 hover:opacity-100 transition-opacity duration-300" />
         </div>
         <p className="text-sm text-muted-foreground font-mono uppercase tracking-widest">
           SYSTEM ONLINE • v1.0.0
