@@ -1,0 +1,366 @@
+{
+  "id": "hospital",
+  "name": "Hospital ER",
+  "missions": [
+    {
+      "id": "MSN-501",
+      "name": "Trauma Code T-14",
+      "type": "Emergency",
+      "status": "diverged",
+      "priority": 1,
+      "deadline": "2026-07-09T18:05:00.000Z",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Triage Assessment",
+          "type": "medical",
+          "status": "complete",
+          "duration": 5,
+          "assignedResourceId": null,
+          "dependencies": []
+        },
+        {
+          "id": "t2",
+          "name": "CT Scan",
+          "type": "imaging",
+          "status": "pending",
+          "duration": 15,
+          "assignedResourceId": null,
+          "dependencies": [
+            "t1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MSN-502",
+      "name": "Ambulance Inbound",
+      "type": "Arrival",
+      "status": "in-progress",
+      "priority": 2,
+      "deadline": "2026-07-09T18:15:00.000Z",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Bay Assign",
+          "type": "logistics",
+          "status": "complete",
+          "duration": 2,
+          "assignedResourceId": null,
+          "dependencies": []
+        },
+        {
+          "id": "t2",
+          "name": "Patient Transfer",
+          "type": "medical",
+          "status": "active",
+          "duration": 5,
+          "assignedResourceId": null,
+          "dependencies": [
+            "t1"
+          ]
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "id": "RES-H1",
+      "type": "CT Scanner",
+      "status": "failed",
+      "name": "CT-Main",
+      "currentAssignment": null
+    },
+    {
+      "id": "RES-H2",
+      "type": "Trauma Bay",
+      "status": "occupied",
+      "name": "Bay 3",
+      "currentAssignment": null
+    },
+    {
+      "id": "RES-H3",
+      "type": "Attending",
+      "status": "available",
+      "name": "Dr. Chen",
+      "currentAssignment": null
+    },
+    {
+      "id": "RES-H4",
+      "type": "Ventilator",
+      "status": "unavailable",
+      "name": "Vent-A2",
+      "currentAssignment": null
+    }
+  ],
+  "nodes": [
+    {
+      "id": "mission-1",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Trauma Code T-14",
+        "status": "diverged"
+      },
+      "type": "missionNode"
+    },
+    {
+      "id": "task-1",
+      "type": "taskNode",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Triage",
+        "status": "complete"
+      }
+    },
+    {
+      "id": "task-2",
+      "type": "taskNode",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "CT Scan",
+        "status": "pending"
+      }
+    },
+    {
+      "id": "res-1",
+      "type": "resourceNode",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Bay 3",
+        "status": "occupied"
+      }
+    },
+    {
+      "id": "res-2",
+      "type": "resourceNode",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "CT-Main",
+        "status": "failed"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "mission-1",
+      "target": "task-1",
+      "type": "smoothstep",
+      "animated": true,
+      "style": {
+        "stroke": "#6C63FF",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e2",
+      "source": "mission-1",
+      "target": "task-2",
+      "type": "smoothstep",
+      "animated": true,
+      "style": {
+        "stroke": "#6C63FF",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e3",
+      "source": "task-1",
+      "target": "res-1",
+      "type": "smoothstep",
+      "animated": false,
+      "style": {
+        "stroke": "#434343",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e4",
+      "source": "task-2",
+      "target": "res-2",
+      "type": "smoothstep",
+      "animated": true,
+      "style": {
+        "stroke": "#FF4D4D",
+        "strokeWidth": 2,
+        "strokeDasharray": "5,5"
+      }
+    }
+  ],
+  "divergences": [
+    {
+      "id": "DIV-002",
+      "eventId": "EVT-888",
+      "expectedState": "CT-Main Online",
+      "actualState": "CT-Main Failed (Coolant Leak)",
+      "severity": "critical",
+      "detectedAt": "2026-07-09T17:55:00.000Z"
+    }
+  ],
+  "memories": [
+    {
+      "id": "MEM-H90",
+      "type": "Equipment Failure",
+      "strategy": "Portable Unit Deploy",
+      "confidence": 91.0,
+      "outcome": "success",
+      "date": "2026-07-09T10:15:00Z",
+      "resolutionTime": null
+    },
+    {
+      "id": "MEM-H84",
+      "type": "Staff Shortage",
+      "strategy": "On-Call Activation",
+      "confidence": 85.0,
+      "outcome": "success",
+      "date": "2026-07-08T02:30:00Z",
+      "resolutionTime": null
+    },
+    {
+      "id": "MEM-H81",
+      "type": "Bed Overflow",
+      "strategy": "Ward Re-allocation",
+      "confidence": 58.0,
+      "outcome": "failure",
+      "date": "2026-07-06T20:10:00Z",
+      "resolutionTime": null
+    },
+    {
+      "id": "MEM-H79",
+      "type": "Supply Chain",
+      "strategy": "Emergency Restock",
+      "confidence": 96.0,
+      "outcome": "success",
+      "date": "2026-07-05T14:45:00Z",
+      "resolutionTime": null
+    },
+    {
+      "id": "MEM-H75",
+      "type": "Equipment Failure",
+      "strategy": "Portable Unit Deploy",
+      "confidence": 89.0,
+      "outcome": "success",
+      "date": "2026-07-01T09:20:00Z",
+      "resolutionTime": null
+    },
+    {
+      "id": "MEM-H72",
+      "type": "Contamination",
+      "strategy": "Isolation Protocol",
+      "confidence": 99.0,
+      "outcome": "success",
+      "date": "2026-06-28T16:05:00Z",
+      "resolutionTime": null
+    }
+  ],
+  "confidenceData": [
+    {
+      "strategy": "Portable Deploy",
+      "confidence": 91
+    },
+    {
+      "strategy": "On-Call Act",
+      "confidence": 85
+    },
+    {
+      "strategy": "Ward Swap",
+      "confidence": 58
+    },
+    {
+      "strategy": "Divert Inbound",
+      "confidence": 72
+    },
+    {
+      "strategy": "Manual Override",
+      "confidence": 40
+    }
+  ],
+  "recovery": {
+    "eventType": "Critical Equipment Failure: CT-Main",
+    "affectedMissions": [
+      "Trauma Code T-14"
+    ],
+    "confidence": 91.0,
+    "steps": [
+      {
+        "id": "step-1",
+        "title": "Semantic Routing Engine",
+        "description": "Scanning hospital grid for available portable imaging units.",
+        "status": "complete",
+        "metrics": [
+          {
+            "label": "Search Radius",
+            "value": "All Floors",
+            "trend": "neutral"
+          },
+          {
+            "label": "Candidates",
+            "value": "3",
+            "trend": "down"
+          }
+        ],
+        "codeSnippet": null,
+        "duration": 45
+      },
+      {
+        "id": "step-2",
+        "title": "Constraint Validation",
+        "description": "Verifying portable CT capabilities for trauma assessment.",
+        "status": "complete",
+        "metrics": [
+          {
+            "label": "Valid Matches",
+            "value": "1",
+            "trend": "down"
+          }
+        ],
+        "codeSnippet": "def check_capabilities(scanner, patient):\n  if not scanner.resolution >= patient.req_resolution:\n    return False\n  if scanner.battery_level < 20:\n    return False\n  return True",
+        "duration": 120
+      },
+      {
+        "id": "step-3",
+        "title": "Dispatch Authorization",
+        "description": "Paging imaging tech to deploy Portable-CT-2 to Bay 3.",
+        "status": "active",
+        "metrics": [
+          {
+            "label": "Selected Resource",
+            "value": "Portable-CT-2",
+            "trend": "neutral"
+          },
+          {
+            "label": "ETA",
+            "value": "2m 30s",
+            "trend": "up"
+          }
+        ],
+        "codeSnippet": null,
+        "duration": 300
+      },
+      {
+        "id": "step-4",
+        "title": "Graph Mutation",
+        "description": "Committing new edges to the Operational Graph and resolving divergence.",
+        "status": "pending",
+        "metrics": null,
+        "codeSnippet": null,
+        "duration": null
+      }
+    ]
+  }
+}
