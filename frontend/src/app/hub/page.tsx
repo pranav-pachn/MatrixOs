@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { EnvironmentGrid } from "@/components/hub/EnvironmentGrid";
+import { MatrixLogo } from "@/components/ui/MatrixLogo";
 
 export default function HubPage() {
   return (
@@ -11,6 +12,11 @@ export default function HubPage() {
       {/* Subtle dark radial gradient background to anchor the cards */}
       <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
         <div className="absolute w-[800px] h-[800px] bg-[radial-gradient(ellipse_at_center,rgba(82,39,255,0.06)_0%,transparent_60%)]" />
+      </div>
+
+      {/* Standalone Brand Logo - Absolute Top Left */}
+      <div className="absolute top-8 left-8 z-50">
+        <MatrixLogo className="scale-90 opacity-60 hover:opacity-100 transition-opacity duration-300" />
       </div>
 
       {/* Main content — vertically centered in remaining space */}
