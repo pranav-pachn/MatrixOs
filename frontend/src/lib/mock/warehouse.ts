@@ -73,7 +73,7 @@ export const warehouseScenario: Scenario = {
     { strategy: "Spillover Assign", confidence: 64 },
     { strategy: "Manual Override", confidence: 35 },
   ],
-  recovery: {
+  currentPlan: {
     eventType: "Autonomous Path Obstruction: Sector 7G",
     affectedMissions: ["Outbound Freight 404"],
     confidence: 97,

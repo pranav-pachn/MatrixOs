@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Mission, Resource, Divergence, Memory, RecoveryStep, Scenario, SystemMetrics, InvariantResult, RuntimePhase, PhaseState } from "@/types/runtime";
+import { Mission, Resource, Divergence, Memory, RecoveryStep, Scenario, SystemMetrics, InvariantResult, RuntimePhase, PhaseState, RuntimeEvent, CurrentPlan } from "@/types/runtime";
 import { Node, Edge } from "@xyflow/react";
 
 import { airportScenario } from "../mock/airport";
@@ -15,8 +15,8 @@ interface RuntimeState {
   divergences: Divergence[];
   memories: Memory[];
   confidenceData: { strategy: string; confidence: number }[];
-  recovery: Scenario["recovery"];
-  events: any[];
+  currentPlan?: CurrentPlan;
+  runtimeEvents: RuntimeEvent[];
   
   metrics: any | null;
   invariants: InvariantResult[];
@@ -27,21 +27,19 @@ interface RuntimeState {
   
   // Actions
   loadScenario: (scenarioId: string) => Promise<void>;
-  setMissions: (missions: Mission[]) => void;
-  setResources: (resources: Resource[]) => void;
-  setNodes: (nodes: Node[]) => void;
-  setEdges: (edges: Edge[]) => void;
-  setDivergences: (divergences: Divergence[]) => void;
-  addEvent: (event: any) => void;
+  
+  // WS Reducers
+  setSnapshot: (scenario: Scenario) => void;
+  applyReplay: (events: RuntimeEvent[]) => void;
+  addEvent: (event: RuntimeEvent) => void;
   
   setPhaseState: (phase: RuntimePhase, state: PhaseState) => void;
   resetLifecycle: () => void;
   
+  setCurrentPlan: (plan: CurrentPlan) => void;
   setMetrics: (metrics: any) => void;
-  setInvariants: (invariants: InvariantResult[]) => void;
   setWsConnected: (connected: boolean) => void;
-  updateRecoveryPlan: (recovery: Scenario["recovery"]) => void;
-  updateWorldState: (missions: Mission[], resources: Resource[], divergences: Divergence[], edges: Edge[]) => void;
+  updateWorldState: (scenario: Partial<Scenario>) => void;
   resolveDivergence: (divergenceId: string) => void;
 }
 
@@ -60,8 +58,8 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
   divergences: airportScenario.divergences,
   memories: airportScenario.memories,
   confidenceData: airportScenario.confidenceData,
-  recovery: airportScenario.recovery,
-  events: [],
+  currentPlan: airportScenario.currentPlan,
+  runtimeEvents: [],
   
   metrics: null,
   invariants: [],
@@ -86,11 +84,11 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
   loadScenario: async (scenarioId: string) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/scenarios/${scenarioId}/state`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/scenarios/${scenarioId}/state`);
       if (!response.ok) throw new Error("Failed to fetch scenario state");
       const scenario: Scenario = await response.json();
       
-      const metricsRes = await fetch(`http://127.0.0.1:8000/api/scenarios/${scenarioId}/metrics`);
+      const metricsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/scenarios/${scenarioId}/metrics`);
       let metrics = null;
       if (metricsRes.ok) {
         metrics = await metricsRes.json();
@@ -105,7 +103,7 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
         divergences: scenario.divergences,
         memories: scenario.memories,
         confidenceData: scenario.confidenceData,
-        recovery: scenario.recovery,
+        currentPlan: scenario.currentPlan,
         metrics,
         isLoading: false
       });
@@ -122,18 +120,35 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
         divergences: scenario.divergences,
         memories: scenario.memories,
         confidenceData: scenario.confidenceData,
-        recovery: scenario.recovery,
+        currentPlan: scenario.currentPlan,
         isLoading: false
       });
     }
   },
 
-  setMissions: (missions) => set({ missions }),
-  setResources: (resources) => set({ resources }),
-  setNodes: (nodes) => set({ nodes }),
-  setEdges: (edges) => set({ edges }),
-  setDivergences: (divergences) => set({ divergences }),
-  addEvent: (event) => set((state) => ({ events: [event, ...state.events] })),
+  setSnapshot: (scenario) => set({
+    missions: scenario.missions,
+    resources: scenario.resources,
+    nodes: scenario.nodes,
+    edges: scenario.edges,
+    divergences: scenario.divergences,
+    memories: scenario.memories,
+    confidenceData: scenario.confidenceData,
+    currentPlan: scenario.currentPlan,
+  }),
+
+  applyReplay: (events) => set((state) => {
+    const existingIds = new Set(state.runtimeEvents.map((e) => e.id));
+    const newEvents = events.reverse().filter((e) => !existingIds.has(e.id));
+    return {
+      runtimeEvents: [...newEvents, ...state.runtimeEvents]
+    };
+  }),
+
+  addEvent: (event) => set((state) => {
+    if (state.runtimeEvents.some((e) => e.id === event.id)) return state;
+    return { runtimeEvents: [event, ...state.runtimeEvents] };
+  }),
   
   setPhaseState: (phase, stateData) => set((state) => ({
     lifecycle: {
@@ -158,11 +173,15 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
     }
   }),
   
+  setCurrentPlan: (plan) => set({ currentPlan: plan }),
   setMetrics: (metrics) => set({ metrics }),
-  setInvariants: (invariants) => set({ invariants }),
   setWsConnected: (connected) => set({ wsConnected: connected }),
-  updateRecoveryPlan: (recovery) => set({ recovery }),
-  updateWorldState: (missions, resources, divergences, edges) => set({ missions, resources, divergences, edges }),
+  
+  updateWorldState: (scenario) => set((state) => ({ 
+    ...state,
+    ...scenario
+  })),
+  
   resolveDivergence: (divergenceId) => set((state) => ({
     divergences: state.divergences.filter(d => d.id !== divergenceId)
   }))

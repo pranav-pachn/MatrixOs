@@ -18,8 +18,8 @@ class GeminiPlanner(PlannerLLM):
         
         try:
             raw = await gateway._execute_with_retry(
-                gateway.gemini_clients,
-                gateway.gemini_model,
+                gateway.groq_clients,
+                gateway.groq_model,
                 prompt,
                 temperature=0.2,
                 max_tokens=2000
@@ -28,10 +28,9 @@ class GeminiPlanner(PlannerLLM):
         except PlannerParseError as e:
             # One retry with correction
             correction = f"Your previous response failed validation: {e}. Please strictly follow the schema and rules. Return ONLY valid JSON."
-            retry_prompt = f"{prompt}\n\n{correction}"
             raw = await gateway._execute_with_retry(
-                gateway.gemini_clients,
-                gateway.gemini_model,
+                gateway.groq_clients,
+                gateway.groq_model,
                 retry_prompt,
                 temperature=0.1,
                 max_tokens=2000
@@ -46,8 +45,8 @@ class DeepSeekPlanner(PlannerLLM):
         prompt = f"{system}\n\n{user}"
         
         raw = await gateway._execute_with_retry(
-            gateway.deepseek_clients,
-            gateway.deepseek_model,
+            gateway.groq_clients,
+            gateway.groq_model,
             prompt,
             temperature=0.2,
             max_tokens=2000
@@ -62,8 +61,8 @@ class OpenRouterPlanner(PlannerLLM):
         prompt = f"{system}\n\n{user}"
         
         raw = await gateway._execute_with_retry(
-            gateway.openrouter_clients,
-            gateway.openrouter_model,
+            gateway.groq_clients,
+            gateway.groq_model,
             prompt,
             temperature=0.2,
             max_tokens=2000

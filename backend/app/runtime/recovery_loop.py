@@ -4,28 +4,25 @@ import time
 from typing import List, Optional
 import asyncio
 
-from app.models.events import (
-    RuntimePhaseEvent, RuntimePhase, RecoveryPlanEvent,
-    WorldStateUpdateEvent, DivergenceResolvedEvent
-)
-from app.models.domain import Recovery, Memory
-from app.websocket.manager import manager
+from app.models.events import RuntimePhase, RuntimeEvent
+from app.models.domain import CurrentPlan, Memory
+from app.websocket.broadcaster import runtime_broadcaster
 from app.agents.recovery import recovery_agent
 from app.runtime.state_manager import state_manager
 from app.runtime.execution_engine import execution_runtime
 from app.recovery_intelligence.rie_service import rie_service
 from app.recovery_intelligence.schemas import RecoveryRequest
-from app.recovery_intelligence.memory.sqlite_store import memory_store
+from memory.memory_service import operational_memory
 
 async def broadcast_phase(scenario_id: str, phase: RuntimePhase, status: str, message: str, duration: int = None):
-    event = RuntimePhaseEvent(
-        timestamp=datetime.datetime.utcnow().isoformat(),
-        event=f"runtime.phase.{status}",
+    event = RuntimeEvent(
+        id=str(uuid.uuid4()),
+        type=f"runtime.phase.{status}",
         phase=phase,
-        message=message,
-        duration=duration
+        timestamp=datetime.datetime.utcnow().isoformat(),
+        payload={"message": message, "duration": duration}
     )
-    await manager.broadcast_model(scenario_id, event)
+    await runtime_broadcaster.publish(scenario_id, event)
 
 async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: str):
     scenario = await state_manager.get_scenario(scenario_id)
@@ -133,6 +130,17 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
             constraint_violations = ["Resource Capacity", "Task Dependencies"]
             await broadcast_phase(scenario_id, RuntimePhase.OPTIMIZING, "failed", failure_reason, duration_ms)
             
+            operational_memory.record(
+                disruption_type=event_type,
+                mission_type=scenario_id,
+                strategy_id=best_plan.id,
+                strategy_name=best_plan.title,
+                success=False,
+                delay_minutes=0,
+                latency_ms=duration_ms,
+                failure_reason=failure_reason
+            )
+            
             if attempt < max_attempts:
                 continue
             else:
@@ -149,6 +157,28 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
             "actions": optimized_plan.assignments
         }
         
+        scenario.currentPlan = CurrentPlan(
+            eventType=event_type,
+            affectedMissions=best_plan.affected_resources,
+            confidence=best_plan.confidence,
+            steps=[]
+        )
+        await state_manager.apply_recovery_actions(scenario_id, scenario)
+        
+        # Broadcast plan update so frontend shows Recovery Pipeline
+        await runtime_broadcaster.publish(scenario_id, RuntimeEvent(
+            id=str(uuid.uuid4()),
+            type="runtime.plan.updated",
+            timestamp=datetime.datetime.utcnow().isoformat(),
+            payload={
+                "eventType": event_type,
+                "affectedMissions": best_plan.affected_resources,
+                "confidence": best_plan.confidence,
+                "steps": []
+            }
+        ))
+
+        
         # Phase 6: VALIDATING
         start_time = time.perf_counter()
         await broadcast_phase(scenario_id, RuntimePhase.VALIDATING, "started", "Validating invariant constraints...")
@@ -164,13 +194,15 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
             await broadcast_phase(scenario_id, RuntimePhase.EXECUTING, "started", "Applying state mutations...")
             
             # Write to operational memory
-            memory_store.write_record(
-                event_type=event_type,
-                strategy=best_plan.title,
-                outcome="success",
-                confidence=best_plan.confidence,
-                delay=optimized_plan.estimated_delay,
-                context=scenario_id
+            operational_memory.record(
+                disruption_type=event_type,
+                mission_type=scenario_id,
+                strategy_id=best_plan.id,
+                strategy_name=best_plan.title,
+                success=True,
+                delay_minutes=optimized_plan.estimated_delay,
+                latency_ms=duration_ms,
+                failure_reason=None
             )
             
             # Post-execution State Updates
@@ -187,29 +219,12 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
             )
             await state_manager.add_memory(scenario_id, memory)
             
-            recovery_obj = Recovery(
-                eventType=event_type,
-                affectedMissions=best_plan.affected_resources,
-                confidence=best_plan.confidence,
-                steps=[]
-            )
-            
-            await manager.broadcast_model(scenario_id, RecoveryPlanEvent(
+            # The execution runtime returned the mutated scenario
+            await runtime_broadcaster.publish(scenario_id, RuntimeEvent(
+                id=str(uuid.uuid4()),
+                type="runtime.state.updated",
                 timestamp=datetime.datetime.utcnow().isoformat(),
-                data=recovery_obj
-            ))
-            
-            await manager.broadcast_model(scenario_id, DivergenceResolvedEvent(
-                timestamp=datetime.datetime.utcnow().isoformat(),
-                divergenceId=divergence_id
-            ))
-            
-            await manager.broadcast_model(scenario_id, WorldStateUpdateEvent(
-                timestamp=datetime.datetime.utcnow().isoformat(),
-                missions=result.scenario.missions,
-                resources=result.scenario.resources,
-                edges=result.scenario.edges,
-                divergences=result.scenario.divergences
+                payload=result.scenario.model_dump()
             ))
             
             duration_ms = int((time.perf_counter() - start_time) * 1000)
@@ -221,6 +236,18 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
             failure_reason = "Invariant Engine rejected the plan."
             constraint_violations = result.validation_errors or ["Unknown Validation Error"]
             await broadcast_phase(scenario_id, RuntimePhase.VALIDATING, "failed", f"Validation rejected: {reasons}", duration_ms)
+            
+            operational_memory.record(
+                disruption_type=event_type,
+                mission_type=scenario_id,
+                strategy_id=best_plan.id,
+                strategy_name=best_plan.title,
+                success=False,
+                delay_minutes=optimized_plan.estimated_delay,
+                latency_ms=duration_ms,
+                failure_reason=f"{failure_reason} ({reasons})"
+            )
+            
             if attempt < max_attempts:
                 continue
             else:

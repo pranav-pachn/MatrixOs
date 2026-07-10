@@ -83,7 +83,7 @@ class RecoveryStep(BaseModel):
     codeSnippet: Optional[str] = None
     duration: Optional[int] = None
 
-class Recovery(BaseModel):
+class CurrentPlan(BaseModel):
     eventType: str
     affectedMissions: List[str]
     confidence: float
@@ -99,7 +99,7 @@ class Scenario(BaseModel):
     divergences: List[Divergence]
     memories: List[Memory]
     confidenceData: List[Dict[str, Any]]
-    recovery: Recovery
+    currentPlan: Optional[CurrentPlan] = None
 
 class SystemMetrics(BaseModel):
     systemHealth: float

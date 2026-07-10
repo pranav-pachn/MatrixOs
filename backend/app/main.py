@@ -1,20 +1,21 @@
 import datetime
 import uuid
-from typing import List
+from typing import List, Dict, Any
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.models.events import AdapterModel, InjectEventRequest, InjectEventResponse, NewDivergenceEvent, Divergence
-from app.models.domain import Scenario, SystemMetrics, AdapterMetric, ConstraintRule, AdapterEvent, RuntimeMetrics
+from app.models.events import AdapterModel, InjectEventRequest, InjectEventResponse, RuntimeEvent
+from app.models.domain import Scenario, SystemMetrics, AdapterMetric, ConstraintRule, AdapterEvent, RuntimeMetrics, Divergence
 from app.runtime.state_manager import state_manager
 from app.websocket.manager import manager
-from app.events.bus import event_bus
+from app.websocket.broadcaster import runtime_broadcaster
 from app.adapters.loader import load_all_adapters
 from app.adapters.registry import get as get_adapter
-from typing import Dict, Any
 from app.runtime.recovery_loop import run_recovery_loop
 from app.runtime.metrics_service import compute_metrics
+from memory.schemas import MemoryStats, RecoveryRecord
+from memory.memory_service import operational_memory
 
 app = FastAPI(title="MatrixOS Backend - Foundation")
 
@@ -122,6 +123,12 @@ async def get_events(scenario_id: str):
         raise HTTPException(status_code=404, detail="Adapter not found")
     return adapter.events()
 
+@app.get("/api/scenarios/{scenario_id}/events/replay")
+async def get_replay(scenario_id: str):
+    if scenario_id not in ALLOWED_SCENARIOS:
+        raise HTTPException(status_code=400, detail="Invalid scenario ID")
+    return [e.model_dump() for e in runtime_broadcaster.get_replay(scenario_id)]
+
 @app.post("/api/scenarios/{scenario_id}/execute", response_model=Scenario)
 async def execute_plan(scenario_id: str, plan: Dict[str, Any]):
     adapter = get_adapter(scenario_id)
@@ -131,6 +138,14 @@ async def execute_plan(scenario_id: str, plan: Dict[str, Any]):
     new_state = adapter.execute(plan, current_state)
     await state_manager.apply_recovery_actions(scenario_id, new_state)
     return new_state
+
+@app.get("/api/memory/{disruption_type}/stats", response_model=MemoryStats)
+async def get_memory_stats(disruption_type: str):
+    return operational_memory.statistics(disruption_type)
+
+@app.get("/api/memory/recent", response_model=List[RecoveryRecord])
+async def get_recent_memory():
+    return operational_memory.recent(limit=10)
 
 @app.get("/health")
 async def health_check():
@@ -168,16 +183,14 @@ async def inject_event(request: InjectEventRequest, background_tasks: Background
     # Add to state manager
     await state_manager.add_divergence(request.scenarioId, divergence)
     
-    # Broadcast via EventBus
-    event = NewDivergenceEvent(
+    # Broadcast via RuntimeBroadcaster
+    event = RuntimeEvent(
+        id=event_id,
+        type="runtime.divergence.detected",
         timestamp=datetime.datetime.utcnow().isoformat(),
-        eventId=event_id,
-        type=request.type,
-        message=f"Divergence triggered: {request.type}",
-        severity="critical",
-        divergence=divergence
+        payload={"event": request.type}
     )
-    await event_bus.broadcast(event)
+    await runtime_broadcaster.publish(request.scenarioId, event)
     
     # Trigger the AI Recovery Loop in the background
     background_tasks.add_task(run_recovery_loop, request.scenarioId, request.type, divergence_id)
@@ -212,8 +225,4 @@ class OptimizeRequest(BaseModel):
 async def optimize_plan(scenario_id: str, request: OptimizeRequest):
     if scenario_id not in ALLOWED_SCENARIOS:
         raise HTTPException(status_code=400, detail="Invalid scenario ID")
-    
-    # Normally this would fetch the specific plan from a cache.
-    # For now, we return a 501 Not Implemented or we can run the pipeline here if we wanted.
-    # We will just expose the endpoint stub as requested in the plan for inspection.
     raise HTTPException(status_code=501, detail="Standalone optimization inspection coming soon. Currently runs in recovery loop.")

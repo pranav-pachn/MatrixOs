@@ -1,5 +1,5 @@
 import pytest
-from app.planner.schemas import PlannerRequest, CandidatePlan, PlannerResponse
+from app.planner.schemas import PlannerRequest, CandidatePlan, PlannerResponse, RecoveryIntent
 from app.planner.parser import PlannerParser, PlannerParseError
 from app.policy.engine import PolicyEngine
 
@@ -18,7 +18,7 @@ def test_parser_valid_json():
           "estimated_delay": 5,
           "confidence": 0.9,
           "reasoning": "Reason A",
-          "actions": []
+          "recovery_intent": {"strategy_type": "Delay", "resource_type_needed": "", "target_mission_id": "", "max_delay_minutes": 5, "priority": "Low"}
         },
         {
           "id": "B",
@@ -29,7 +29,7 @@ def test_parser_valid_json():
           "estimated_delay": 0,
           "confidence": 0.8,
           "reasoning": "Reason B",
-          "actions": []
+          "recovery_intent": {"strategy_type": "Reassign", "resource_type_needed": "", "target_mission_id": "", "max_delay_minutes": 0, "priority": "High"}
         },
         {
           "id": "C",
@@ -40,7 +40,7 @@ def test_parser_valid_json():
           "estimated_delay": 0,
           "confidence": 0.1,
           "reasoning": "Reason C",
-          "actions": []
+          "recovery_intent": {"strategy_type": "Cancel", "resource_type_needed": "", "target_mission_id": "", "max_delay_minutes": 0, "priority": "Low"}
         }
       ]
     }
@@ -70,7 +70,7 @@ def test_parser_wrong_number_of_plans():
           "estimated_delay": 5,
           "confidence": 0.9,
           "reasoning": "Reason A",
-          "actions": []
+          "recovery_intent": {"strategy_type": "Delay", "resource_type_needed": "", "target_mission_id": "", "max_delay_minutes": 5, "priority": "Low"}
         }
       ]
     }
@@ -85,21 +85,24 @@ def test_policy_engine_scoring():
     engine.resource_penalty = 1.0
     engine.confidence_bonus = 10.0
     
+    intent_a = RecoveryIntent(strategy_type="Delay", resource_type_needed="", target_mission_id="", max_delay_minutes=10, priority="Low")
     plan_a = CandidatePlan(
         id="A", title="A", description="A", strategy="Delay",
-        affected_resources=["r1"], estimated_delay=10, confidence=0.9, reasoning="A", actions=[]
+        affected_resources=["r1"], estimated_delay=10, confidence=0.9, reasoning="A", recovery_intent=intent_a
     )
     # Score A: (0.9 * 10) - (10 * 0.5) - (1 * 1.0) = 9 - 5 - 1 = 3.0
     
+    intent_b = RecoveryIntent(strategy_type="Reassign", resource_type_needed="", target_mission_id="", max_delay_minutes=2, priority="High")
     plan_b = CandidatePlan(
         id="B", title="B", description="B", strategy="Reassign",
-        affected_resources=["r2", "r3"], estimated_delay=2, confidence=0.95, reasoning="B", actions=[]
+        affected_resources=["r2", "r3"], estimated_delay=2, confidence=0.95, reasoning="B", recovery_intent=intent_b
     )
     # Score B: (0.95 * 10) - (2 * 0.5) - (2 * 1.0) = 9.5 - 1 - 2 = 6.5
     
+    intent_c = RecoveryIntent(strategy_type="Reallocate", resource_type_needed="", target_mission_id="", max_delay_minutes=5, priority="Medium")
     plan_c = CandidatePlan(
         id="C", title="C", description="C", strategy="Reallocate",
-        affected_resources=["r1"], estimated_delay=5, confidence=0.5, reasoning="C", actions=[]
+        affected_resources=["r1"], estimated_delay=5, confidence=0.5, reasoning="C", recovery_intent=intent_c
     )
     # Score C: (0.5 * 10) - (5 * 0.5) - (1 * 1.0) = 5 - 2.5 - 1 = 1.5
 

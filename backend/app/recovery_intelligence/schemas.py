@@ -2,15 +2,7 @@ from pydantic import BaseModel
 from typing import List
 from app.models.domain import Scenario
 from app.planner.schemas import RecoveryIntent
-
-class MemoryRecord(BaseModel):
-    event_type: str
-    strategy: str
-    outcome: str
-    confidence: float
-    delay: int
-    context: str
-    timestamp: str
+from memory.schemas import RecoveryRecord
 
 class RecoveryRequest(BaseModel):
     world_state: Scenario
@@ -18,7 +10,7 @@ class RecoveryRequest(BaseModel):
     failure_reason: str
     event_type: str
     constraint_violations: List[str]
-    retrieval_memory: List[MemoryRecord] = []
+    retrieval_memory: List[RecoveryRecord] = []
 
 class RecoveryStrategy(BaseModel):
     title: str

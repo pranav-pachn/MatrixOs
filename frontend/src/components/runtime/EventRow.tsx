@@ -3,15 +3,15 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export interface EventRowProps {
-  id: string;
-  type: string;
-  timestamp: string;
-  severity: "info" | "warning" | "critical";
-  description: string;
-}
+import { RuntimeEvent } from "@/types/runtime";
 
-export function EventRow({ id, type, timestamp, severity, description }: EventRowProps) {
+export function EventRow({ id, type, timestamp, payload }: RuntimeEvent) {
+  let severity: "info" | "warning" | "critical" = "info";
+  if (type.includes("failed")) severity = "critical";
+  else if (type.includes("detected")) severity = "warning";
+  else if (type.includes("started")) severity = "info";
+
+  const description = payload?.message || payload?.event || type;
   const severityStyles = {
     info: {
       dot: "bg-chart-3 shadow-[0_0_8px_rgba(41,182,246,0.6)]",
@@ -51,7 +51,7 @@ export function EventRow({ id, type, timestamp, severity, description }: EventRo
         {/* Type Badge */}
         <div className="w-32 shrink-0">
           <span className={`px-2 py-1 rounded-md text-[10px] font-mono font-bold uppercase tracking-widest border ${severityStyles[severity].badge}`}>
-            {type.replace("_", " ")}
+            {type.split(".").pop()}
           </span>
         </div>
         

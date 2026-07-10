@@ -23,15 +23,18 @@ class PlannerService:
         constraints = adapter.constraints()
         objectives = getattr(adapter, "objectives", lambda: [])()
         
-        # Last 5 memories for context
-        memory = state.memories[-5:] if state.memories else []
+        # Operational memory via new service
+        from memory.memory_service import operational_memory
+        stats = operational_memory.statistics(event_type)
+        recent_records = operational_memory.retrieve(event_type, limit=5)
         
         request = PlannerRequest(
             world_state=state,
             current_event=event_type,
             constraints=constraints,
             objectives=objectives,
-            operational_memory=memory
+            operational_memory=recent_records,
+            memory_stats=stats
         )
         
         try:

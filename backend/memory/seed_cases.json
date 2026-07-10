@@ -1,0 +1,68 @@
+[
+  {
+    "disruption_type": "fuel_truck_failure",
+    "mission_type": "AirportTurnaround",
+    "strategy_id": "BACKUP_TRUCK",
+    "strategy_name": "Reassign nearest available fuel truck",
+    "success": true,
+    "delay_minutes": 15,
+    "latency_ms": 312,
+    "failure_reason": null,
+    "context_snapshot": {"weather": "clear", "peak_hours": true}
+  },
+  {
+    "disruption_type": "fuel_truck_failure",
+    "mission_type": "AirportTurnaround",
+    "strategy_id": "DELAY_BOARDING",
+    "strategy_name": "Delay boarding until primary truck is repaired",
+    "success": false,
+    "delay_minutes": 45,
+    "latency_ms": 890,
+    "failure_reason": "Exceeded max turnaround delay invariant",
+    "context_snapshot": {"weather": "rain", "peak_hours": true}
+  },
+  {
+    "disruption_type": "gate_unavailable",
+    "mission_type": "AirportTurnaround",
+    "strategy_id": "GATE_SWAP",
+    "strategy_name": "Gate swap to adjacent open stand",
+    "success": true,
+    "delay_minutes": 5,
+    "latency_ms": 210,
+    "failure_reason": null,
+    "context_snapshot": {"active_flights": 18}
+  },
+  {
+    "disruption_type": "heavy_rain",
+    "mission_type": "AirportTurnaround",
+    "strategy_id": "DELAY_BOARDING_10M",
+    "strategy_name": "Delay boarding by 10 minutes",
+    "success": true,
+    "delay_minutes": 10,
+    "latency_ms": 150,
+    "failure_reason": null,
+    "context_snapshot": {"weather": "rain"}
+  },
+  {
+    "disruption_type": "power_outage",
+    "mission_type": "ER_Triage",
+    "strategy_id": "REROUTE_PATIENTS",
+    "strategy_name": "Reroute critical patients to secondary triage",
+    "success": true,
+    "delay_minutes": 8,
+    "latency_ms": 350,
+    "failure_reason": null,
+    "context_snapshot": {"icu_capacity": "90%"}
+  },
+  {
+    "disruption_type": "forklift_battery_dead",
+    "mission_type": "WarehouseFulfillment",
+    "strategy_id": "MANUAL_JACKS",
+    "strategy_name": "Deploy manual pallet jacks for lightweight tasks",
+    "success": true,
+    "delay_minutes": 12,
+    "latency_ms": 280,
+    "failure_reason": null,
+    "context_snapshot": {"shift": "night", "backlog": 120}
+  }
+]

@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { MemoryTable } from "@/components/runtime/MemoryTable";
 import { ConfidenceChart } from "@/components/runtime/ConfidenceChart";
+import { SemanticMap } from "@/components/runtime/SemanticMap";
+import { ProceduralPlaybooks } from "@/components/runtime/ProceduralPlaybooks";
 import { Brain, Graph, BracketsCurly } from "@phosphor-icons/react/dist/ssr";
 import { motion } from "framer-motion";
 
@@ -72,22 +74,14 @@ export default function MemoryPage() {
         )}
 
         {activeTab === "semantic" && (
-          <div className="h-full flex items-center justify-center border border-dashed border-border/50 rounded-2xl bg-card/10">
-            <div className="text-center">
-              <Graph size={48} className="text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-bold font-sans text-muted-foreground">Semantic Map Offline</h3>
-              <p className="text-xs text-muted-foreground/50 mt-2 font-mono">MatrixOS requires live graph database connection.</p>
-            </div>
+          <div className="h-full min-h-0">
+            <SemanticMap />
           </div>
         )}
 
         {activeTab === "procedural" && (
-          <div className="h-full flex items-center justify-center border border-dashed border-border/50 rounded-2xl bg-card/10">
-            <div className="text-center">
-              <BracketsCurly size={48} className="text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-lg font-bold font-sans text-muted-foreground">Procedural Weights Offline</h3>
-              <p className="text-xs text-muted-foreground/50 mt-2 font-mono">Awaiting neural net sync.</p>
-            </div>
+          <div className="h-full min-h-0">
+            <ProceduralPlaybooks />
           </div>
         )}
       </div>

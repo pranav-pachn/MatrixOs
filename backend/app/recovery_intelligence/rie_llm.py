@@ -27,11 +27,11 @@ class RecoveryLLM:
         user = RIEPromptBuilder.build_user_message(request, memory_data)
         prompt = f"{system}\n\n{user}"
         
-        # Primary: Gemini
+        # Primary: Groq
         try:
             raw = await gateway._execute_with_retry(
-                gateway.gemini_clients,
-                gateway.gemini_model,
+                gateway.groq_clients,
+                gateway.groq_model,
                 prompt,
                 temperature=0.3,
                 max_tokens=1500
@@ -40,11 +40,11 @@ class RecoveryLLM:
         except Exception as e:
             print(f"RIE Primary (Gemini) failed: {e}. Trying fallback.")
             
-        # Fallback 1: DeepSeek
+        # Fallback 1: Groq
         try:
             raw = await gateway._execute_with_retry(
-                gateway.deepseek_clients,
-                gateway.deepseek_model,
+                gateway.groq_clients,
+                gateway.groq_model,
                 prompt,
                 temperature=0.3,
                 max_tokens=1500
@@ -53,10 +53,10 @@ class RecoveryLLM:
         except Exception as e:
             print(f"RIE Fallback (DeepSeek) failed: {e}. Trying OpenRouter.")
             
-        # Fallback 2: OpenRouter
+        # Fallback 2: Groq
         raw = await gateway._execute_with_retry(
-            gateway.openrouter_clients,
-            gateway.openrouter_model,
+            gateway.groq_clients,
+            gateway.groq_model,
             prompt,
             temperature=0.3,
             max_tokens=1500

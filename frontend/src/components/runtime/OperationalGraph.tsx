@@ -46,8 +46,8 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = "TB") => 
 };
 
 export function OperationalGraph() {
-  const storeNodes = useRuntimeStore((state) => state.nodes);
-  const storeEdges = useRuntimeStore((state) => state.edges);
+  const missions = useRuntimeStore((state) => state.missions);
+  const resources = useRuntimeStore((state) => state.resources);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -61,12 +61,68 @@ export function OperationalGraph() {
 
   // When store data changes, recalculate the dagre layout
   useEffect(() => {
-    if (storeNodes.length > 0) {
-      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(storeNodes, storeEdges, "TB");
+    // Generate dynamic nodes and edges from missions and resources
+    const dynamicNodes: Node[] = [];
+    const dynamicEdges: Edge[] = [];
+
+    // Add Resources
+    resources.forEach((res) => {
+      dynamicNodes.push({
+        id: res.id,
+        type: "resourceNode",
+        position: { x: 0, y: 0 },
+        data: { label: res.name, status: res.status.toLowerCase() },
+      });
+    });
+
+    // Add Missions and Tasks
+    missions.forEach((mission) => {
+      dynamicNodes.push({
+        id: mission.id,
+        type: "missionNode",
+        position: { x: 0, y: 0 },
+        data: { label: mission.name, status: mission.status.toLowerCase() },
+      });
+
+      mission.tasks.forEach((task) => {
+        const taskId = `${mission.id}-${task.id}`;
+        dynamicNodes.push({
+          id: taskId,
+          type: "taskNode",
+          position: { x: 0, y: 0 },
+          data: { label: task.name, status: task.status.toLowerCase() },
+        });
+
+        // Edge: Mission -> Task
+        dynamicEdges.push({
+          id: `e-${mission.id}-${taskId}`,
+          source: mission.id,
+          target: taskId,
+          type: "smoothstep",
+          animated: task.status !== "COMPLETED",
+          style: { stroke: "#6C63FF", strokeWidth: 2 },
+        });
+
+        // Edge: Task -> Resource
+        if (task.assignedResourceId) {
+          dynamicEdges.push({
+            id: `e-${taskId}-${task.assignedResourceId}`,
+            source: taskId,
+            target: task.assignedResourceId,
+            type: "smoothstep",
+            animated: task.status === "RUNNING",
+            style: { stroke: "#FF4D4D", strokeWidth: 2, strokeDasharray: "5,5" },
+          });
+        }
+      });
+    });
+
+    if (dynamicNodes.length > 0) {
+      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(dynamicNodes, dynamicEdges, "TB");
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
     }
-  }, [storeNodes, storeEdges, setNodes, setEdges]);
+  }, [missions, resources, setNodes, setEdges]);
 
   return (
     <div className="w-full h-full relative">

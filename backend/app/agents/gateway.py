@@ -42,6 +42,8 @@ class LLMGateway:
         
         def create_clients(keys_list, base_url, **kwargs):
             if not keys_list: return []
+            kwargs.setdefault('timeout', 3.0)
+            kwargs.setdefault('http_client', http_client)
             return [AsyncOpenAI(api_key=k, base_url=base_url, **kwargs) for k in keys_list]
 
         # 1. Gemini (Event Interpretation)
@@ -115,14 +117,14 @@ class LLMGateway:
         """
         try:
             return await self._execute_with_retry(
-                self.gemini_clients, 
-                self.gemini_model, 
+                self.groq_clients, 
+                self.groq_model, 
                 prompt, 
                 temperature=0.2, 
                 max_tokens=100
             )
         except Exception as e:
-            print(f"Gemini Impact Assessment Error: {e}")
+            print(f"Groq Impact Assessment Error: {e}")
             return await self.fallback_call(prompt)
 
     async def plan_recovery(self, event_type: str, scenario: Scenario) -> Dict[str, Any]:
@@ -166,27 +168,27 @@ class LLMGateway:
         """
         try:
             content = await self._execute_with_retry(
-                self.deepseek_clients,
-                self.deepseek_model,
+                self.groq_clients,
+                self.groq_model,
                 prompt,
                 temperature=0.2,
                 max_tokens=1000
             )
             return self._parse_json(content, event_type)
         except Exception as e:
-            print(f"DeepSeek Planning Error: {e}")
-            print("Falling back to OpenRouter...")
+            print(f"Groq Planning Error: {e}")
+            print("Falling back to DeepSeek...")
             try:
                 fallback_content = await self._execute_with_retry(
-                    self.openrouter_clients,
-                    self.openrouter_model,
+                    self.groq_clients,
+                    self.groq_model,
                     prompt,
                     temperature=0.2,
                     max_tokens=1000
                 )
                 return self._parse_json(fallback_content, event_type)
             except Exception as fallback_e:
-                print(f"OpenRouter Fallback Error: {fallback_e}")
+                print(f"DeepSeek Fallback Error: {fallback_e}")
                 return self._error_plan(event_type, str(fallback_e))
 
     async def fast_ui_interaction(self, prompt: str) -> str:
@@ -205,8 +207,8 @@ class LLMGateway:
     async def fallback_call(self, prompt: str) -> str:
         try:
             return await self._execute_with_retry(
-                self.openrouter_clients,
-                self.openrouter_model,
+                self.groq_clients,
+                self.groq_model,
                 prompt,
                 temperature=0.5,
                 max_tokens=200

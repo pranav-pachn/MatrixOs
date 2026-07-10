@@ -1,13 +1,15 @@
 from typing import List, Optional
 from pydantic import BaseModel
-from app.models.domain import Scenario, ConstraintRule, Memory, RecoveryAction
+from app.models.domain import Scenario, ConstraintRule
+from memory.schemas import RecoveryRecord, MemoryStats
 
 class PlannerRequest(BaseModel):
     world_state: Scenario
     current_event: str
     constraints: List[ConstraintRule]
     objectives: List[str]
-    operational_memory: List[Memory]
+    operational_memory: List[RecoveryRecord]
+    memory_stats: MemoryStats
 
 class RecoveryIntent(BaseModel):
     strategy_type: str

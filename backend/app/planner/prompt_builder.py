@@ -22,11 +22,27 @@ class PromptBuilder:
         objectives_text = "\n".join([f"{i+1}. {obj}" for i, obj in enumerate(request.objectives)])
         
         memory_text = "None"
-        if request.operational_memory:
-            memories = []
-            for m in request.operational_memory:
-                memories.append(f"Event: {m.type} | Strategy: {m.strategy} | Outcome: {m.outcome} | Confidence: {m.confidence}%")
-            memory_text = "\n".join(memories)
+        stats = request.memory_stats
+        
+        if stats.total_occurrences > 0:
+            memory_text = f"Operational Memory for {request.current_event}:\n"
+            memory_text += f"- Occurrences: {stats.total_occurrences}\n"
+            memory_text += f"- Best Strategy: {stats.best_strategy}\n"
+            memory_text += f"- Success Rate: {stats.success_rate * 100:.1f}%\n"
+            
+            successes = [m for m in request.operational_memory if m.success]
+            failures = [m for m in request.operational_memory if not m.success]
+            
+            if successes:
+                memory_text += "\nRecent Successes:\n"
+                for m in successes:
+                    memory_text += f"- {m.strategy_name} (Delay: {m.delay_minutes}m)\n"
+                    
+            if failures:
+                memory_text += "\nRecent Failures:\n"
+                for m in failures:
+                    reason = m.failure_reason or "Unknown"
+                    memory_text += f"- {m.strategy_name} | Reason: {reason}\n"
 
         prompt = f"""
 Current Event:

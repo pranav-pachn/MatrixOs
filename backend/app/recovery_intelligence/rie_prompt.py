@@ -48,8 +48,15 @@ Output ONLY valid JSON matching this schema:
         if episodic:
             memory_text += "Past Successful Recoveries:\n"
             for i, m in enumerate(episodic):
-                if m.outcome == "success":
-                    memory_text += f"{i+1}. {m.strategy} (Confidence: {m.confidence}, Delay: {m.delay}m)\n"
+                if m.success:
+                    memory_text += f"{i+1}. {m.strategy_name} (Delay: {m.delay_minutes}m)\n"
+            
+            failures = [m for m in episodic if not m.success]
+            if failures:
+                memory_text += "\nPast Failures (Do Not Repeat):\n"
+                for i, m in enumerate(failures):
+                    reason = m.failure_reason or "Unknown"
+                    memory_text += f"- {m.strategy_name} | Reason: {reason}\n"
         
         if procedural:
             memory_text += "\nKnown Repair Playbooks for this Event:\n"

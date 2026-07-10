@@ -2,55 +2,59 @@ import sqlite3
 import json
 import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "memory.db")
-JSON_PATH = os.path.join(os.path.dirname(__file__), "recovery_cases.json")
+DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "memory.db"))
+JSON_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "memory", "seed_cases.json"))
 
 def seed_db():
-    # Only seed if the DB doesn't exist to preserve runtime changes during testing
     if os.path.exists(DB_PATH):
-        print("memory.db already exists. Skipping seed.")
-        return
+        # Check if new table exists
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='recoveries'")
+        table_exists = cursor.fetchone()
+        conn.close()
+        
+        if table_exists:
+            print("memory.db already has 'recoveries' table. Skipping seed.")
+            return
+        else:
+            print("memory.db is missing 'recoveries' table. Proceeding to seed.")
 
-    print("Seeding memory.db from recovery_cases.json...")
+    print("Seeding memory.db from memory/seed_cases.json...")
     
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+    # Initialize repository
+    import sys
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    from memory.repository import repository
+    from memory.schemas import RecoveryRecord
     
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS episodic_memory (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            event_type TEXT NOT NULL,
-            strategy TEXT NOT NULL,
-            outcome TEXT NOT NULL,
-            confidence REAL,
-            delay INTEGER,
-            context TEXT,
-            timestamp TEXT
-        )
-    """)
+    repository.create_tables()
     
     if os.path.exists(JSON_PATH):
         with open(JSON_PATH, "r") as f:
             cases = json.load(f)
+            import uuid
+            import datetime
             for case in cases:
-                cursor.execute("""
-                    INSERT INTO episodic_memory (event_type, strategy, outcome, confidence, delay, context, timestamp)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    case.get("event_type"), 
-                    case.get("strategy"), 
-                    case.get("outcome"), 
-                    case.get("confidence"), 
-                    case.get("delay"), 
-                    case.get("context"), 
-                    case.get("timestamp")
-                ))
+                case_id = f"case_{uuid.uuid4().hex[:8]}"
+                timestamp = datetime.datetime.utcnow().isoformat()
+                record = RecoveryRecord(
+                    id=case_id,
+                    disruption_type=case.get("disruption_type"),
+                    mission_type=case.get("mission_type"),
+                    strategy_id=case.get("strategy_id"),
+                    strategy_name=case.get("strategy_name"),
+                    success=case.get("success"),
+                    delay_minutes=case.get("delay_minutes"),
+                    latency_ms=case.get("latency_ms"),
+                    failure_reason=case.get("failure_reason"),
+                    context_snapshot=case.get("context_snapshot"),
+                    timestamp=timestamp
+                )
+                repository.insert(record)
         print(f"Seeded {len(cases)} operational memory records.")
     else:
         print(f"Seed file {JSON_PATH} not found.")
-
-    conn.commit()
-    conn.close()
 
 if __name__ == "__main__":
     seed_db()

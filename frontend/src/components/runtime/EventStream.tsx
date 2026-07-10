@@ -1,21 +1,24 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { EventRow, EventRowProps } from "./EventRow";
+import { EventRow } from "./EventRow";
 import { useRuntimeStore } from "@/lib/store/runtime";
 
 export function EventStream() {
   const [isClient, setIsClient] = useState(false);
   const {
-    events,
+    runtimeEvents: events,
     addEvent,
     activeScenarioId,
     wsConnected,
     setWsConnected,
-    updateRecoveryPlan,
+    setSnapshot,
+    applyReplay,
     updateWorldState,
-    resolveDivergence,
-    setMetrics
+    setMetrics,
+    setPhaseState,
+    resetLifecycle,
+    setCurrentPlan
   } = useRuntimeStore();
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -28,21 +31,24 @@ export function EventStream() {
 
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5;
+    let isMounted = true;
 
     const connect = () => {
+      if (!isMounted) return;
       if (wsRef.current?.readyState === WebSocket.OPEN) return;
       
-      const ws = new WebSocket(`ws://127.0.0.1:8000/ws/runtime/${activeScenarioId}`);
+      const ws = new WebSocket(`${process.env.NEXT_PUBLIC_WS_URL ?? 'ws://127.0.0.1:8000'}/ws/runtime/${activeScenarioId}`);
       wsRef.current = ws;
 
       ws.onopen = () => {
+        if (!isMounted) { ws.close(); return; }
         setWsConnected(true);
         reconnectAttempts = 0;
       };
 
       ws.onclose = () => {
         setWsConnected(false);
-        if (reconnectAttempts < maxReconnectAttempts) {
+        if (isMounted && reconnectAttempts < maxReconnectAttempts) {
           const timeout = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
           reconnectTimeoutRef.current = setTimeout(connect, timeout);
           reconnectAttempts++;
@@ -50,63 +56,54 @@ export function EventStream() {
       };
 
       ws.onmessage = (event) => {
+        if (!isMounted) return;
         try {
           const data = JSON.parse(event.data);
           
-          if (data.event === "new_divergence") {
-            // Also reset lifecycle when a new divergence happens
-            useRuntimeStore.getState().resetLifecycle();
-            addEvent({
-              id: data.eventId,
-              type: "divergence",
-              timestamp: data.timestamp,
-              severity: data.severity,
-              description: data.message
-            });
-          } 
-          else if (data.event.startsWith("runtime.phase.")) {
-            const status = data.event.split(".")[2]; // started, completed, failed
-            
-            // Map the backend status to frontend RuntimePhaseStatus
-            let mappedStatus = "running";
-            if (status === "completed") mappedStatus = "success";
-            if (status === "failed") mappedStatus = "failed";
-            if (status === "started") mappedStatus = "running";
-
-            useRuntimeStore.getState().setPhaseState(data.phase, {
-              status: mappedStatus as any,
-              message: data.message,
-              duration: data.duration
-            });
-
-            addEvent({
-              id: `evt-${crypto.randomUUID()}`,
-              type: "agent_action",
-              timestamp: data.timestamp,
-              severity: status === "failed" ? "critical" : "info",
-              description: `[${data.phase}] ${data.message}`
-            });
-          }
-          else if (data.event === "agent_action") {
-            addEvent({
-              id: `evt-${crypto.randomUUID()}`,
-              type: "agent_action",
-              timestamp: data.timestamp,
-              severity: "info",
-              description: data.message
-            });
-          }
-          else if (data.event === "recovery_plan") {
-            updateRecoveryPlan(data.data);
-          }
-          else if (data.event === "world_state_update") {
-            updateWorldState(data.missions, data.resources, data.divergences, data.edges);
-          }
-          else if (data.event === "divergence_resolved") {
-            resolveDivergence(data.divergenceId);
-          }
-          else if (data.event === "metrics_update") {
-            setMetrics(data.data);
+          switch (data.type) {
+            case "runtime.snapshot":
+              setSnapshot(data.payload);
+              break;
+              
+            case "runtime.replay":
+              applyReplay(data.payload.events);
+              break;
+              
+            case "runtime.ready":
+              // We could show a toast or transition state if needed
+              break;
+              
+            case "runtime.divergence.detected":
+              resetLifecycle();
+              addEvent(data);
+              break;
+              
+            case "runtime.phase.started":
+            case "runtime.phase.completed":
+            case "runtime.phase.failed":
+              let status = "running";
+              if (data.type === "runtime.phase.completed") status = "success";
+              if (data.type === "runtime.phase.failed") status = "failed";
+              
+              setPhaseState(data.phase, {
+                status: status as any,
+                message: data.payload.message,
+                duration: data.payload.duration
+              });
+              addEvent(data);
+              break;
+              
+            case "runtime.state.updated":
+              updateWorldState(data.payload);
+              break;
+              
+            case "runtime.metrics.updated":
+              setMetrics(data.payload);
+              break;
+              
+            case "runtime.plan.updated":
+              setCurrentPlan(data.payload);
+              break;
           }
         } catch (e) {
           console.error("Failed to parse WS message", e);
@@ -117,16 +114,20 @@ export function EventStream() {
     connect();
 
     return () => {
+      isMounted = false;
       if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       if (wsRef.current) {
-        wsRef.current.close();
+        if (wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.close();
+        }
         wsRef.current = null;
       }
     };
   }, [
-    activeScenarioId, addEvent, setWsConnected, updateRecoveryPlan, 
-    updateWorldState, resolveDivergence, setMetrics
+    activeScenarioId, addEvent, setWsConnected, setSnapshot, applyReplay,
+    updateWorldState, setMetrics, setPhaseState, resetLifecycle, setCurrentPlan
   ]);
+
 
   if (!isClient) return null;
 

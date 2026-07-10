@@ -32,13 +32,24 @@ export interface Mission {
   tasks: Task[];
 }
 
+export type RuntimeEventType =
+  | "runtime.divergence.detected"
+  | "runtime.phase.started"
+  | "runtime.phase.completed"
+  | "runtime.phase.failed"
+  | "runtime.state.updated"
+  | "runtime.metrics.updated"
+  | "runtime.plan.updated"
+  | "runtime.snapshot"
+  | "runtime.replay"
+  | "runtime.ready";
+
 export interface RuntimeEvent {
   id: string;
-  type: string;
-  timestamp: string; // ISO timestamp
-  severity: EventSeverity;
-  description: string;
-  affectedMissions: string[];
+  type: RuntimeEventType;
+  phase?: RuntimePhase;
+  timestamp: string;
+  payload: Record<string, any>;
 }
 
 export interface Divergence {
@@ -123,6 +134,13 @@ export interface PhaseState {
 }
 
 
+export interface CurrentPlan {
+  eventType: string;
+  affectedMissions: string[];
+  confidence: number;
+  steps: RecoveryStep[];
+}
+
 export interface Scenario {
   id: string;
   name: string;
@@ -133,10 +151,5 @@ export interface Scenario {
   divergences: Divergence[];
   memories: Memory[];
   confidenceData: { strategy: string; confidence: number }[];
-  recovery: {
-    eventType: string;
-    affectedMissions: string[];
-    confidence: number;
-    steps: RecoveryStep[];
-  };
+  currentPlan?: CurrentPlan;
 }

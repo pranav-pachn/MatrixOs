@@ -78,10 +78,10 @@ export const airportScenario: Scenario = {
     { strategy: "Gate Swap", confidence: 62 },
     { strategy: "Override", confidence: 45 },
   ],
-  recovery: {
-    eventType: "Resource Failure: Engine Stall",
-    affectedMissions: ["Flight AA102"],
-    confidence: 94,
+  currentPlan: {
+    eventType: "Fuel Truck Breakdown",
+    affectedMissions: ["UA402", "DL891"],
+    confidence: 0.94,
     steps: [
       {
         id: "step-1",

@@ -6,10 +6,10 @@ import { ValidationResult } from "./ValidationResult";
 import { useRuntimeStore } from "@/lib/store/runtime";
 
 export function ReasoningPanel() {
-  const { divergences, invariants, events } = useRuntimeStore();
+  const { divergences, invariants, runtimeEvents: events } = useRuntimeStore();
 
   const agentActions = events
-    .filter(e => e.type === "agent_action" || e.type === "validation" || e.type === "impact_assessment" || e.type === "planning" || e.type === "validation_success" || e.type === "validation_failure")
+    .filter(e => e.type.startsWith("runtime.phase.") || e.type === "runtime.divergence.detected")
     .slice(0, 6);
 
   return (
@@ -76,13 +76,13 @@ export function ReasoningPanel() {
         <section className="mt-6 border border-border/50 bg-background rounded-lg p-3 overflow-hidden">
            <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary mb-2">Repair Engine (AI)</h3>
            <div className="text-xs font-mono flex flex-col space-y-1">
-             {agentActions.length > 0 ? (
-               agentActions.map((action, idx) => (
-                 <span key={action.id} className={idx === 0 ? "text-foreground" : "text-muted-foreground"}>
-                   {">"} {action.description || action.message}
-                 </span>
-               ))
-             ) : (
+              {agentActions.length > 0 ? (
+                agentActions.map((action, idx) => (
+                  <span key={action.id} className={idx === 0 ? "text-foreground" : "text-muted-foreground"}>
+                    {">"} {action.payload?.message || action.payload?.event || action.type}
+                  </span>
+                ))
+              ) : (
                <span className="text-muted-foreground">{">"} Idle... waiting for telemetry.</span>
              )}
            </div>

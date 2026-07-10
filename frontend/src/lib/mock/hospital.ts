@@ -74,7 +74,7 @@ export const hospitalScenario: Scenario = {
     { strategy: "Divert Inbound", confidence: 72 },
     { strategy: "Manual Override", confidence: 40 },
   ],
-  recovery: {
+  currentPlan: {
     eventType: "Critical Equipment Failure: CT-Main",
     affectedMissions: ["Trauma Code T-14"],
     confidence: 91,
