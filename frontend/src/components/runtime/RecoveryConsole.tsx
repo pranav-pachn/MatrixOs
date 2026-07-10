@@ -11,16 +11,30 @@ export function RecoveryConsole() {
   const divergences = useRuntimeStore((state) => state.divergences);
   const activeScenarioId = useRuntimeStore((state) => state.activeScenarioId);
   
-  // Define the ordered 7 steps of the MatrixOS Runtime
-  const phases: { phase: RuntimePhase, label: string }[] = [
+  // Define the core steps of the MatrixOS Runtime
+  const corePhases: { phase: RuntimePhase, label: string }[] = [
     { phase: "OBSERVING", label: "Observe Event" },
     { phase: "ASSESSING", label: "Impact Assessment" },
     { phase: "PLANNING", label: "Recovery Planning" },
     { phase: "POLICY", label: "Policy Evaluation" },
     { phase: "OPTIMIZING", label: "Optimize Schedule" },
     { phase: "VALIDATING", label: "Invariant Validation" },
-    { phase: "EXECUTING", label: "Runtime Execution" },
   ];
+  
+  const riePhases: { phase: RuntimePhase, label: string }[] = [
+    { phase: "RECOVERY_ACTIVATED", label: "Recovery Intelligence Activated" },
+    { phase: "MEMORY_RETRIEVED", label: "Memory Retrieval" },
+    { phase: "RECOVERY_REPLANNING", label: "Synthesize Alternative" },
+  ];
+
+  // Only show RIE phases if they have been activated
+  const showRIE = lifecycle["RECOVERY_ACTIVATED"].status !== "pending";
+  
+  let phases = [...corePhases];
+  if (showRIE) {
+    phases = [...phases, ...riePhases];
+  }
+  phases.push({ phase: "EXECUTING", label: "Runtime Execution" });
 
   // Calculate totals for the footer
   let totalLatency = 0;

@@ -109,7 +109,10 @@ export type RuntimePhase =
   | "VALIDATING"
   | "EXECUTING"
   | "COMPLETED"
-  | "FAILED";
+  | "FAILED"
+  | "RECOVERY_ACTIVATED"
+  | "MEMORY_RETRIEVED"
+  | "RECOVERY_REPLANNING";
 
 export type RuntimePhaseStatus = "pending" | "running" | "success" | "failed";
 

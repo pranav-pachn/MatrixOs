@@ -26,6 +26,11 @@ class RuntimePhase(str, Enum):
     OPTIMIZING = "OPTIMIZING"
     VALIDATING = "VALIDATING"
     EXECUTING = "EXECUTING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    RECOVERY_ACTIVATED = "RECOVERY_ACTIVATED"
+    MEMORY_RETRIEVED = "MEMORY_RETRIEVED"
+    RECOVERY_REPLANNING = "RECOVERY_REPLANNING"
 
 class RuntimePhaseEvent(WSEnvelope):
     event: Literal["runtime.phase.started", "runtime.phase.completed", "runtime.phase.failed"]

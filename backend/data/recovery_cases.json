@@ -1,0 +1,56 @@
+[
+    {
+        "event_type": "fuel_truck_failure",
+        "strategy": "Reassign nearest available fuel truck",
+        "outcome": "success",
+        "confidence": 0.92,
+        "delay": 15,
+        "context": "airport",
+        "timestamp": "2026-07-09T10:00:00Z"
+    },
+    {
+        "event_type": "fuel_truck_failure",
+        "strategy": "Delay boarding until primary truck is repaired",
+        "outcome": "failure",
+        "confidence": 0.40,
+        "delay": 45,
+        "context": "airport",
+        "timestamp": "2026-07-09T11:00:00Z"
+    },
+    {
+        "event_type": "gate_unavailable",
+        "strategy": "Gate swap to adjacent open stand",
+        "outcome": "success",
+        "confidence": 0.88,
+        "delay": 5,
+        "context": "airport",
+        "timestamp": "2026-07-09T12:00:00Z"
+    },
+    {
+        "event_type": "heavy_rain",
+        "strategy": "Delay boarding by 10 minutes",
+        "outcome": "success",
+        "confidence": 0.95,
+        "delay": 10,
+        "context": "airport",
+        "timestamp": "2026-07-09T13:00:00Z"
+    },
+    {
+        "event_type": "power_outage",
+        "strategy": "Reroute critical patients to secondary triage",
+        "outcome": "success",
+        "confidence": 0.85,
+        "delay": 8,
+        "context": "hospital-er",
+        "timestamp": "2026-07-09T14:00:00Z"
+    },
+    {
+        "event_type": "forklift_battery_dead",
+        "strategy": "Deploy manual pallet jacks for lightweight tasks",
+        "outcome": "success",
+        "confidence": 0.90,
+        "delay": 12,
+        "context": "warehouse-hub",
+        "timestamp": "2026-07-09T15:00:00Z"
+    }
+]

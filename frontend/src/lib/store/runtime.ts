@@ -78,6 +78,9 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
     EXECUTING: { status: "pending" },
     COMPLETED: { status: "pending" },
     FAILED: { status: "pending" },
+    RECOVERY_ACTIVATED: { status: "pending" },
+    MEMORY_RETRIEVED: { status: "pending" },
+    RECOVERY_REPLANNING: { status: "pending" },
   },
 
   loadScenario: async (scenarioId: string) => {
@@ -149,6 +152,9 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
       EXECUTING: { status: "pending" },
       COMPLETED: { status: "pending" },
       FAILED: { status: "pending" },
+      RECOVERY_ACTIVATED: { status: "pending" },
+      MEMORY_RETRIEVED: { status: "pending" },
+      RECOVERY_REPLANNING: { status: "pending" },
     }
   }),
   

@@ -28,6 +28,14 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
+    import sys
+    import os
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+    try:
+        from data.seed import seed_db
+        seed_db()
+    except Exception as e:
+        print(f"Failed to seed DB: {e}")
     load_all_adapters()
 
 ALLOWED_SCENARIOS = ["airport", "hospital-er", "warehouse-hub"]
