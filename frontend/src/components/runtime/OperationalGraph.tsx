@@ -65,14 +65,21 @@ export function OperationalGraph() {
     const dynamicNodes: Node[] = [];
     const dynamicEdges: Edge[] = [];
 
-    // Add Resources
+    // Find all resources that are actually assigned to tasks to prevent floating disconnected nodes
+    const assignedResourceIds = new Set(
+      missions.flatMap(mission => mission.tasks.map(task => task.assignedResourceId)).filter(Boolean)
+    );
+
+    // Add Resources (Only those assigned to active tasks)
     resources.forEach((res) => {
-      dynamicNodes.push({
-        id: res.id,
-        type: "resourceNode",
-        position: { x: 0, y: 0 },
-        data: { label: res.name, status: res.status.toLowerCase() },
-      });
+      if (assignedResourceIds.has(res.id) || res.status === "FAILED") {
+        dynamicNodes.push({
+          id: res.id,
+          type: "resourceNode",
+          position: { x: 0, y: 0 },
+          data: { label: res.name, status: res.status.toLowerCase() },
+        });
+      }
     });
 
     // Add Missions and Tasks
@@ -118,7 +125,8 @@ export function OperationalGraph() {
     });
 
     if (dynamicNodes.length > 0) {
-      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(dynamicNodes, dynamicEdges, "TB");
+      // Use LR (Left-to-Right) layout for a cleaner timeline appearance
+      const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(dynamicNodes, dynamicEdges, "LR");
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);
     }
