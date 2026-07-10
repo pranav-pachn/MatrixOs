@@ -1,9 +1,13 @@
 "use client";
 
-import React from "react";
-import { Lightning, CloudRain, WarningCircle, Users, Ambulance } from "@phosphor-icons/react/dist/ssr";
+import React, { useState } from "react";
+import { Lightning, CloudRain, WarningCircle, Users, Ambulance, CircleNotch } from "@phosphor-icons/react/dist/ssr";
+import { useRuntimeStore } from "@/lib/store/runtime";
 
 export function TriggerEventPanel() {
+  const activeScenarioId = useRuntimeStore((state) => state.activeScenarioId);
+  const [injectingId, setInjectingId] = useState<string | null>(null);
+
   const triggers = [
     { id: "fuel", label: "Fuel Truck Failure", icon: Lightning, glow: "group-hover:shadow-[0_0_20px_rgba(255,77,77,0.4)] group-hover:border-destructive/60", iconColor: "text-destructive group-hover:text-destructive" },
     { id: "weather", label: "Heavy Rain (Cat 2)", icon: CloudRain, glow: "group-hover:shadow-[0_0_20px_rgba(41,182,246,0.4)] group-hover:border-chart-3/60", iconColor: "text-chart-3 group-hover:text-chart-3" },
@@ -26,15 +30,37 @@ export function TriggerEventPanel() {
       <div className="space-y-4 relative z-10">
         {triggers.map((trigger) => {
           const Icon = trigger.icon;
+          const isInjecting = injectingId === trigger.id;
+          
           return (
             <button
               key={trigger.id}
-              onClick={() => alert(`In a real backend, this would inject a ${trigger.label} event.`)}
-              className={`w-full group relative overflow-hidden px-5 py-4 rounded-xl border border-border/30 bg-background/40 backdrop-blur-sm flex items-center justify-between transition-all duration-300 ${trigger.glow} active:scale-[0.98]`}
+              disabled={!!injectingId}
+              onClick={async () => {
+                try {
+                  setInjectingId(trigger.id);
+                  const res = await fetch("http://127.0.0.1:8001/api/events/inject", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ scenarioId: activeScenarioId, type: trigger.id })
+                  });
+                  if (!res.ok) throw new Error("Failed to inject event");
+                } catch (e) {
+                  console.error(e);
+                  alert(`Failed to inject event: ${e}`);
+                } finally {
+                  setInjectingId(null);
+                }
+              }}
+              className={`w-full group relative overflow-hidden px-5 py-4 rounded-xl border border-border/30 bg-background/40 backdrop-blur-sm flex items-center justify-between transition-all duration-300 ${!injectingId ? trigger.glow : ''} ${!injectingId ? 'active:scale-[0.98] cursor-pointer' : 'opacity-70 cursor-not-allowed'}`}
             >
               <div className="flex items-center space-x-4">
                 <div className={`p-2.5 rounded-lg bg-card/50 shadow-neu-inset border border-border/50 transition-colors ${trigger.iconColor}`}>
-                  <Icon size={20} weight="duotone" />
+                  {isInjecting ? (
+                    <CircleNotch size={20} className="animate-spin text-muted-foreground" />
+                  ) : (
+                    <Icon size={20} weight="duotone" />
+                  )}
                 </div>
                 <span className="text-sm font-sans font-medium text-foreground/80 group-hover:text-foreground transition-colors">
                   {trigger.label}

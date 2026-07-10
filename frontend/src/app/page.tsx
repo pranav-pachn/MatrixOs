@@ -5,8 +5,22 @@ import { LinearHero } from "@/components/landing/LinearHero";
 import { AppMockup } from "@/components/landing/AppMockup";
 import { BentoGrid } from "@/components/landing/BentoGrid";
 import { AirplaneTilt, FirstAid, Package } from "@phosphor-icons/react/dist/ssr";
+import { Adapter } from "@/types/runtime";
 
-export default function Home() {
+async function getAdapters(): Promise<Adapter[]> {
+  try {
+    const res = await fetch("http://127.0.0.1:8001/api/scenarios", { cache: "no-store" });
+    if (!res.ok) return [];
+    return res.json();
+  } catch (e) {
+    console.error("Failed to fetch adapters", e);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const adapters = await getAdapters();
+
   return (
     <div className="min-h-screen bg-[#000000] text-foreground font-sans selection:bg-primary/30">
       
@@ -21,27 +35,50 @@ export default function Home() {
         {/* 3. The Dashboard Mockup (Holding the Adapters) */}
         <AppMockup>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AdapterCard 
-              name="Airport Hub" 
-              description="Aviation turnaround constraint validation." 
-              status="live" 
-              href="/playground/airport"
-              icon={<AirplaneTilt size={32} weight="duotone" />}
-            />
-            <AdapterCard 
-              name="Hospital ER" 
-              description="Trauma bay and imaging resource routing." 
-              status="live" 
-              href="/playground/hospital-er"
-              icon={<FirstAid size={32} weight="duotone" />}
-            />
-            <AdapterCard 
-              name="Warehouse Hub" 
-              description="Autonomous bot swarm pathfinding." 
-              status="live" 
-              href="/playground/warehouse-hub"
-              icon={<Package size={32} weight="duotone" />}
-            />
+            {adapters.length > 0 ? (
+              adapters.map((adapter: Adapter) => {
+                let icon;
+                if (adapter.id === "airport") icon = <AirplaneTilt size={32} weight="duotone" />;
+                else if (adapter.id.includes("hospital")) icon = <FirstAid size={32} weight="duotone" />;
+                else icon = <Package size={32} weight="duotone" />;
+                
+                return (
+                  <AdapterCard 
+                    key={adapter.id}
+                    name={adapter.name} 
+                    description={adapter.description} 
+                    status={adapter.status} 
+                    href={adapter.href}
+                    icon={icon}
+                  />
+                );
+              })
+            ) : (
+              // Fallback
+              <>
+                <AdapterCard 
+                  name="Airport Hub" 
+                  description="Aviation turnaround constraint validation." 
+                  status="live" 
+                  href="/playground/airport"
+                  icon={<AirplaneTilt size={32} weight="duotone" />}
+                />
+                <AdapterCard 
+                  name="Hospital ER" 
+                  description="Patient triage and resource routing." 
+                  status="coming-soon" 
+                  href="/playground/hospital-er"
+                  icon={<FirstAid size={32} weight="duotone" />}
+                />
+                <AdapterCard 
+                  name="Warehouse Hub" 
+                  description="Autonomous bot swarm pathfinding." 
+                  status="coming-soon" 
+                  href="/playground/warehouse-hub"
+                  icon={<Package size={32} weight="duotone" />}
+                />
+              </>
+            )}
           </div>
         </AppMockup>
 

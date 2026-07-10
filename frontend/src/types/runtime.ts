@@ -73,6 +73,21 @@ export interface Memory {
   confidence: number;
   outcome: 'success' | 'failure';
   date: string;
+  resolutionTime?: number;
+}
+
+export interface SystemMetrics {
+  systemHealth: number;
+  activeConstraints: number;
+  divergenceRate: number;
+  recoveryLatency: number;
+  resourceUtilization: number;
+}
+
+export interface InvariantResult {
+  status: ValidationStatus;
+  constraint: string;
+  reason?: string;
 }
 
 export interface RecoveryStep {

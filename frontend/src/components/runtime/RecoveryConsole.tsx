@@ -1,21 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { PipelineStep } from "./PipelineStep";
 import { useRuntimeStore } from "@/lib/store/runtime";
 
 export function RecoveryConsole() {
-  const steps = useRuntimeStore((state) => state.recovery.steps);
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-
-  useEffect(() => {
-    setCurrentStepIndex(0); // Reset when scenario changes
-    const timer = setInterval(() => {
-      setCurrentStepIndex(prev => (prev < steps.length ? prev + 1 : 0));
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [steps]);
+  const steps = useRuntimeStore((state) => state.recovery?.steps || []);
 
   return (
     <div className="flex flex-col h-full bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl p-6 relative overflow-hidden">
@@ -33,52 +24,59 @@ export function RecoveryConsole() {
 
       <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 relative z-10">
         
-        {steps.map((step, index) => {
-          const stepNum = index + 1;
-          const status = currentStepIndex > index ? "complete" : currentStepIndex === index ? "active" : "pending";
-          
-          return (
-            <PipelineStep 
-              key={step.id}
-              step={stepNum} 
-              title={step.title} 
-              status={status}
-              isLast={index === steps.length - 1}
-            >
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">{step.description}</p>
-                
-                {step.codeSnippet && (
-                  <div className="bg-background/80 p-3 rounded-lg border border-border/50 font-mono text-[10px] text-chart-3 overflow-x-auto whitespace-pre">
-                    {step.codeSnippet}
-                  </div>
-                )}
-                
-                {step.metrics && step.metrics.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {step.metrics.map((m, i) => (
-                      <div key={i} className="flex items-center gap-2 px-2 py-1 bg-card border border-border/50 rounded-md text-xs">
-                        <span className="text-muted-foreground uppercase font-mono text-[9px]">{m.label}</span>
-                        <span className="font-bold font-mono text-foreground">{m.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {index === steps.length - 1 && (
-                  <div className="h-1.5 w-full bg-background rounded-full overflow-hidden mt-3 border border-border/50">
-                    <motion.div 
-                      className="h-full bg-chart-4"
-                      initial={{ width: 0 }}
-                      animate={status === "complete" ? { width: "100%" } : status === "active" ? { width: "40%" } : { width: "0%" }}
-                      transition={{ duration: 2 }}
-                    />
-                  </div>
-                )}
-              </div>
-            </PipelineStep>
-          );
-        })}
+        {steps.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-sm text-muted-foreground font-mono">
+            Waiting for recovery plan...
+          </div>
+        ) : (
+          steps.map((step, index) => {
+            const stepNum = index + 1;
+            // Use real status from backend plan, fallback to active if not provided
+            const status = step.status || "active";
+            
+            return (
+              <PipelineStep 
+                key={step.id}
+                step={stepNum} 
+                title={step.title} 
+                status={status}
+                isLast={index === steps.length - 1}
+              >
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                  
+                  {step.codeSnippet && (
+                    <div className="bg-background/80 p-3 rounded-lg border border-border/50 font-mono text-[10px] text-chart-3 overflow-x-auto whitespace-pre">
+                      {step.codeSnippet}
+                    </div>
+                  )}
+                  
+                  {step.metrics && step.metrics.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {step.metrics.map((m, i) => (
+                        <div key={i} className="flex items-center gap-2 px-2 py-1 bg-card border border-border/50 rounded-md text-xs">
+                          <span className="text-muted-foreground uppercase font-mono text-[9px]">{m.label}</span>
+                          <span className="font-bold font-mono text-foreground">{m.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+  
+                  {index === steps.length - 1 && (
+                    <div className="h-1.5 w-full bg-background rounded-full overflow-hidden mt-3 border border-border/50">
+                      <motion.div 
+                        className="h-full bg-chart-4"
+                        initial={{ width: 0 }}
+                        animate={status === "complete" ? { width: "100%" } : status === "active" ? { width: "40%" } : { width: "0%" }}
+                        transition={{ duration: 2 }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </PipelineStep>
+            );
+          })
+        )}
 
       </div>
     </div>

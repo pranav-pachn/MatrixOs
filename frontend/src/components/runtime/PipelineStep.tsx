@@ -7,7 +7,7 @@ import { CheckCircle, CircleDashed, CircleNotch, XCircle } from "@phosphor-icons
 export interface PipelineStepProps {
   step: number;
   title: string;
-  status: "pending" | "active" | "complete" | "rejected";
+  status: "pending" | "active" | "complete" | "rejected" | "failed";
   children: React.ReactNode;
   isLast?: boolean;
 }
@@ -36,6 +36,13 @@ export function PipelineStep({ step, title, status, children, isLast = false }: 
       glow: "shadow-[0_0_15px_rgba(0,208,132,0.2)]"
     },
     rejected: {
+      color: "text-destructive",
+      bg: "bg-destructive/10",
+      border: "border-destructive/50",
+      icon: <XCircle size={24} weight="fill" />,
+      glow: "shadow-[0_0_15px_rgba(255,77,77,0.2)]"
+    },
+    failed: {
       color: "text-destructive",
       bg: "bg-destructive/10",
       border: "border-destructive/50",

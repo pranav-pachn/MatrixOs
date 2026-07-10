@@ -4,6 +4,7 @@
     "@xyflow/react": "^12.11.2",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.23.0",
-    "recharts": "^3.9.2"
+    "recharts": "^3.9.2",
+    "ws": "^8.21.0"
   }
 }

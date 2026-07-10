@@ -1,29 +1,109 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { EventRow, EventRowProps } from "./EventRow";
-
-const mockEvents: EventRowProps[] = [
-  { id: "EVT-1001", type: "system", timestamp: "2026-07-09T18:00:01.000Z", severity: "info", description: "MatrixOS initialized. Core adapters loaded." },
-  { id: "EVT-1002", type: "telemetry", timestamp: "2026-07-09T18:01:15.000Z", severity: "info", description: "Flight AA102 entered airspace boundary." },
-  { id: "EVT-1003", type: "telemetry", timestamp: "2026-07-09T18:03:42.000Z", severity: "info", description: "Flight DL405 gate assignment confirmed (B12)." },
-  { id: "EVT-1004", type: "resource_status", timestamp: "2026-07-09T18:10:00.000Z", severity: "warning", description: "Baggage Cart BC-109 running low on battery (15%)." },
-  { id: "EVT-1005", type: "mission_update", timestamp: "2026-07-09T18:15:22.000Z", severity: "info", description: "Flight AA102 block-in complete." },
-  { id: "EVT-1006", type: "task_complete", timestamp: "2026-07-09T18:30:10.000Z", severity: "info", description: "Flight AA102 Deboarding completed." },
-  { id: "EVT-1007", type: "hardware_fault", timestamp: "2026-07-09T18:31:05.000Z", severity: "critical", description: "Fuel Truck FT-402 engine stall detected." },
-  { id: "EVT-1008", type: "divergence", timestamp: "2026-07-09T18:31:06.000Z", severity: "critical", description: "Divergence triggered: Flight AA102 Fueling blocked." },
-  { id: "EVT-1009", type: "agent_action", timestamp: "2026-07-09T18:31:10.000Z", severity: "warning", description: "AI Agent calculating alternative fueling vectors." },
-  { id: "EVT-1010", type: "agent_action", timestamp: "2026-07-09T18:31:15.000Z", severity: "info", description: "AI Agent re-routing FT-409 to Gate B12." },
-];
+import { useRuntimeStore } from "@/lib/store/runtime";
 
 export function EventStream() {
   const [isClient, setIsClient] = useState(false);
+  const {
+    events,
+    addEvent,
+    activeScenarioId,
+    wsConnected,
+    setWsConnected,
+    updateRecoveryPlan,
+    updateWorldState,
+    resolveDivergence,
+    setMetrics
+  } = useRuntimeStore();
+
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    
+    if (!activeScenarioId) return;
 
-  if (!isClient) return null; // Prevent hydration mismatch with timestamps
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+
+    const connect = () => {
+      if (wsRef.current?.readyState === WebSocket.OPEN) return;
+      
+      const ws = new WebSocket(`ws://127.0.0.1:8001/ws/runtime/${activeScenarioId}`);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setWsConnected(true);
+        reconnectAttempts = 0;
+      };
+
+      ws.onclose = () => {
+        setWsConnected(false);
+        if (reconnectAttempts < maxReconnectAttempts) {
+          const timeout = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
+          reconnectTimeoutRef.current = setTimeout(connect, timeout);
+          reconnectAttempts++;
+        }
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (data.event === "new_divergence") {
+            addEvent({
+              id: data.eventId,
+              type: "divergence",
+              timestamp: data.timestamp,
+              severity: data.severity,
+              description: data.message
+            });
+          } 
+          else if (data.event === "agent_action") {
+            addEvent({
+              id: `evt-${crypto.randomUUID()}`,
+              type: "agent_action",
+              timestamp: data.timestamp,
+              severity: "info",
+              description: data.message
+            });
+          }
+          else if (data.event === "recovery_plan") {
+            updateRecoveryPlan(data.data);
+          }
+          else if (data.event === "world_state_update") {
+            updateWorldState(data.missions, data.resources, data.divergences, data.edges);
+          }
+          else if (data.event === "divergence_resolved") {
+            resolveDivergence(data.divergenceId);
+          }
+          else if (data.event === "metrics_update") {
+            setMetrics(data.data);
+          }
+        } catch (e) {
+          console.error("Failed to parse WS message", e);
+        }
+      };
+    };
+
+    connect();
+
+    return () => {
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, [
+    activeScenarioId, addEvent, setWsConnected, updateRecoveryPlan, 
+    updateWorldState, resolveDivergence, setMetrics
+  ]);
+
+  if (!isClient) return null;
 
   return (
     <div className="flex flex-col h-full bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl overflow-hidden relative">
@@ -39,10 +119,14 @@ export function EventStream() {
         
         <div className="flex items-center space-x-2 bg-background/50 px-3 py-1.5 rounded-full border border-border/50 shadow-neu-inset">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-chart-4 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-chart-4"></span>
+            {wsConnected && (
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-chart-4 opacity-75"></span>
+            )}
+            <span className={`relative inline-flex rounded-full h-2 w-2 ${wsConnected ? 'bg-chart-4' : 'bg-muted-foreground'}`}></span>
           </span>
-          <span className="text-[10px] font-mono text-foreground uppercase tracking-widest">Connected</span>
+          <span className="text-[10px] font-mono text-foreground uppercase tracking-widest">
+            {wsConnected ? 'Connected' : 'Disconnected'}
+          </span>
         </div>
       </div>
 
@@ -51,9 +135,14 @@ export function EventStream() {
 
       {/* Stream Container */}
       <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col-reverse p-2">
-        {mockEvents.map((evt) => (
+        {events.map((evt: any) => (
           <EventRow key={evt.id} {...evt} />
         ))}
+        {events.length === 0 && (
+          <div className="flex items-center justify-center h-full text-sm text-muted-foreground font-mono">
+            Waiting for telemetry...
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,7 +6,12 @@ import { ValidationResult } from "./ValidationResult";
 import { useRuntimeStore } from "@/lib/store/runtime";
 
 export function ReasoningPanel() {
-  const divergences = useRuntimeStore((state) => state.divergences);
+  const { divergences, invariants, events } = useRuntimeStore();
+
+  const agentActions = events
+    .filter(e => e.type === "agent_action" || e.type === "validation" || e.type === "impact_assessment" || e.type === "planning" || e.type === "validation_success" || e.type === "validation_failure")
+    .slice(0, 6);
+
   return (
     <div className="flex flex-col h-full bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl p-6 relative overflow-hidden">
       
@@ -32,8 +37,8 @@ export function ReasoningPanel() {
             {divergences.map((div) => (
               <DivergenceAlert 
                 key={div.id}
-                eventType={`Resource Failure: ${div.actualState}`}
-                affectedMissions={["MSN-101 (Flight AA102)"]} // In real backend, we'd map this from div
+                eventType={`Event: ${div.actualState}`}
+                affectedMissions={["Scenario Impacted"]} // We simplify for the hackathon MVP
                 severity={div.severity}
               />
             ))}
@@ -54,32 +59,33 @@ export function ReasoningPanel() {
           </div>
           
           <div className="space-y-1 relative">
-            <ValidationResult 
-              status="REJECTED"
-              constraint="Aircraft fueled before boarding"
-              reason="Fuel truck FT-402 failed. Task 'Fueling' pending."
-            />
-            <ValidationResult 
-              status="PASS"
-              constraint="Gate assignment valid"
-            />
-            <ValidationResult 
-              status="PASS"
-              constraint="Baggage cart available at gate"
-            />
+            {invariants.length > 0 ? invariants.map((inv, idx) => (
+              <ValidationResult 
+                key={idx}
+                status={inv.status}
+                constraint={inv.constraint}
+                reason={inv.reason}
+              />
+            )) : (
+              <p className="text-xs font-mono text-muted-foreground">Awaiting recovery plan actions...</p>
+            )}
           </div>
         </section>
 
         {/* Agentic Repair Logic Section */}
-        <section className="mt-6 border border-border/50 bg-background rounded-lg p-3">
+        <section className="mt-6 border border-border/50 bg-background rounded-lg p-3 overflow-hidden">
            <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary mb-2">Repair Engine (AI)</h3>
-           <p className="text-xs font-mono text-muted-foreground">
-             {">"} Evaluating fallback resources...
-             <br/>
-             {">"} FT-409 available in Sector B.
-             <br/>
-             <span className="text-foreground">{">"} Re-routing FT-409 to Gate B12 (ETA +4m).</span>
-           </p>
+           <div className="text-xs font-mono flex flex-col space-y-1">
+             {agentActions.length > 0 ? (
+               agentActions.map((action, idx) => (
+                 <span key={action.id} className={idx === 0 ? "text-foreground" : "text-muted-foreground"}>
+                   {">"} {action.description || action.message}
+                 </span>
+               ))
+             ) : (
+               <span className="text-muted-foreground">{">"} Idle... waiting for telemetry.</span>
+             )}
+           </div>
         </section>
 
       </div>

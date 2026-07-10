@@ -97,3 +97,147 @@ If asked "Why can't standard agent frameworks build this?", the answer is:
 **The Invariant Engine.** 
 
 Standard frameworks orchestrate LLM calls. MatrixOS acts as a protective kernel that strictly verifies and recovers operations. It ensures that the AI cannot violate the physics or business rules of the domain.
+
+---
+
+# Tech Stack
+
+## Frontend
+
+- Next.js 15
+- React 19
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Framer Motion
+- React Flow
+- Recharts
+
+## Backend
+
+- FastAPI (Python)
+- WebSockets
+- Pydantic
+- Uvicorn
+
+## AI Runtime
+
+- DeepSeek V4 Pro via NVIDIA API (Recovery & Planner Agents)
+- Structured Outputs
+- Function Calling
+
+## Optimization
+
+- Google OR-Tools (CP-SAT)
+
+## Runtime
+
+- AsyncIO
+- Event Bus
+- Shared World Model
+- Invariant Engine
+- Recovery Memory
+
+## Database
+
+- SQLite (Hackathon MVP)
+
+## Deployment
+
+- Vercel (Frontend)
+- Railway / Render (Backend)
+
+---
+
+# Repository Structure
+
+```
+matrixos/
+│
+├── frontend/
+│
+├── backend/
+│   ├── runtime/
+│   ├── planner/
+│   ├── recovery/
+│   ├── invariants/
+│   ├── adapters/
+│   ├── optimization/
+│   ├── execution/
+│   └── api/
+│
+├── docs/
+│
+└── README.md
+```
+
+---
+
+# Roadmap
+
+## Hackathon MVP
+
+- [x] Shared World Model
+- [x] Runtime Architecture
+- [ ] Planner Agent
+- [ ] Recovery Agent
+- [ ] Invariant Engine
+- [ ] Airport Adapter
+- [ ] Runtime Console
+- [ ] Dynamic Recovery Demo
+
+## Future
+
+- Hospital Adapter
+- Warehouse Adapter
+- Factory Adapter
+- Multi-runtime Coordination
+- Predictive Operational Intelligence
+
+---
+
+# Runtime Architecture
+
+```text
+             MatrixOS Runtime
+
+          Shared World Model
+
+                  │
+
+          Planner Agent (LLM)
+
+                  │
+
+         Recovery Agent (LLM)
+
+                  │
+
+         Invariant Engine
+
+                  │
+
+         Execution Runtime
+
+                  │
+
+          Recovery Memory
+
+                  │
+
+      Airport | Hospital | Factory
+```
+
+---
+
+## MatrixOS vs Traditional Agent Frameworks
+
+| Capability | Traditional Agent Framework | MatrixOS |
+|------------|-----------------------------|----------|
+| Task orchestration | ✅ | ✅ |
+| Continuous world state | ❌ | ✅ |
+| Deterministic safety validation | ❌ | ✅ |
+| Runtime recovery | ⚠️ | ✅ |
+| Domain adapters | ⚠️ | ✅ |
+| Operational invariants | ❌ | ✅ |
+| Adaptive replanning | ⚠️ | ✅ |

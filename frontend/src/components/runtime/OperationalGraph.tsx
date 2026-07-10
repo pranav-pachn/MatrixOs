@@ -49,8 +49,8 @@ export function OperationalGraph() {
   const storeNodes = useRuntimeStore((state) => state.nodes);
   const storeEdges = useRuntimeStore((state) => state.edges);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
   // Node types registry
   const nodeTypes = useMemo(() => ({

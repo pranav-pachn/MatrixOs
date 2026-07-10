@@ -1,7 +1,20 @@
+"use client";
+
 import React from "react";
 import { MetricTile } from "./MetricTile";
+import { useRuntimeStore } from "@/lib/store/runtime";
 
 export function MetricsBar() {
+  const metrics = useRuntimeStore(state => state.metrics);
+
+  if (!metrics) {
+    return (
+      <div className="h-20 w-full flex items-center justify-center border-t border-border bg-card/40 backdrop-blur-md">
+        <span className="text-sm text-muted-foreground font-mono animate-pulse">Loading Telemetry...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="h-20 w-full flex items-center border-t border-border bg-card/40 backdrop-blur-md overflow-x-auto overflow-y-hidden custom-scrollbar">
       <div className="flex flex-nowrap w-full divide-x divide-border/50 px-4">
@@ -9,9 +22,9 @@ export function MetricsBar() {
         <div className="flex-1 min-w-[200px]">
           <MetricTile 
             label="System Health" 
-            value="98.4" 
+            value={metrics.systemHealth.toString()} 
             unit="%" 
-            trend="down" 
+            trend={metrics.systemHealth >= 95 ? "up" : metrics.systemHealth < 80 ? "down" : "neutral"} 
             goodTrend="up" 
           />
         </div>
@@ -19,7 +32,7 @@ export function MetricsBar() {
         <div className="flex-1 min-w-[200px]">
           <MetricTile 
             label="Active Constraints" 
-            value="142" 
+            value={metrics.activeConstraints.toString()} 
             trend="neutral" 
           />
         </div>
@@ -27,9 +40,9 @@ export function MetricsBar() {
         <div className="flex-1 min-w-[200px]">
           <MetricTile 
             label="Divergence Rate" 
-            value="1.2" 
+            value={metrics.divergenceRate.toString()} 
             unit="/hr" 
-            trend="up" 
+            trend={metrics.divergenceRate > 1.5 ? "up" : "down"} 
             goodTrend="down" 
           />
         </div>
@@ -37,9 +50,9 @@ export function MetricsBar() {
         <div className="flex-1 min-w-[200px]">
           <MetricTile 
             label="Recovery Latency" 
-            value="450" 
+            value={metrics.recoveryLatency.toString()} 
             unit="ms" 
-            trend="down" 
+            trend={metrics.recoveryLatency > 1000 ? "up" : "down"} 
             goodTrend="down" 
           />
         </div>
@@ -47,10 +60,10 @@ export function MetricsBar() {
         <div className="flex-1 min-w-[200px]">
           <MetricTile 
             label="Resource Util" 
-            value="87" 
+            value={metrics.resourceUtilization.toString()} 
             unit="%" 
-            trend="up" 
-            goodTrend="down" // 87% might be getting too high for an airport buffer
+            trend={metrics.resourceUtilization > 90 ? "up" : "neutral"} 
+            goodTrend="down" 
           />
         </div>
 
