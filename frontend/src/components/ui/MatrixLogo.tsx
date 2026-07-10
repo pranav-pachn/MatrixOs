@@ -16,8 +16,8 @@ export function MatrixLogo({ className = "", href = "/" }: MatrixLogoProps) {
     >
       {/* Icon */}
       <div className="relative flex items-center justify-center w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#7e41ff] to-[#4500d4] overflow-hidden shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
-        {/* Subtle noise / lines */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+        {/* Dynamic Noise Overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')] opacity-10 mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_49%,rgba(255,255,255,0.1)_50%,transparent_51%)] bg-[length:100%_4px]"></div>
         
         {/* "M" Icon */}
