@@ -27,7 +27,7 @@ export function TriggerEventPanel() {
         <p className="text-xs text-muted-foreground font-sans mt-1">Inject simulated chaos scenarios to trigger AI recovery routines.</p>
       </div>
 
-      <div className="space-y-4 relative z-10">
+      <div className="flex-1 space-y-4 relative z-10 overflow-y-auto custom-scrollbar pr-2 min-h-0">
         {triggers.map((trigger) => {
           const Icon = trigger.icon;
           const isInjecting = injectingId === trigger.id;

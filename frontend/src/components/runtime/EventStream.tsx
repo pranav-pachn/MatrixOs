@@ -160,7 +160,7 @@ export function EventStream() {
       <div className="absolute top-[73px] left-0 right-0 h-8 bg-gradient-to-b from-card/20 to-transparent pointer-events-none z-10" />
 
       {/* Stream Container */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col-reverse p-2">
+      <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col-reverse p-2 min-h-0">
         {events.map((evt: any) => (
           <EventRow key={evt.id} {...evt} />
         ))}

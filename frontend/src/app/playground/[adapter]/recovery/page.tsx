@@ -19,7 +19,7 @@ export default function RecoveryPage() {
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
         
         {/* Left Column: The Problem */}
-        <div className="lg:col-span-1 h-full flex flex-col space-y-6">
+        <div className="lg:col-span-1 h-full flex flex-col space-y-6 min-h-0">
           {currentPlan ? (
             <>
               <div className="bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl p-6">

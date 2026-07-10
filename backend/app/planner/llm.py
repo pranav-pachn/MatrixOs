@@ -28,6 +28,7 @@ class GeminiPlanner(PlannerLLM):
         except PlannerParseError as e:
             # One retry with correction
             correction = f"Your previous response failed validation: {e}. Please strictly follow the schema and rules. Return ONLY valid JSON."
+            retry_prompt = f"{prompt}\n\n{correction}"
             raw = await gateway._execute_with_retry(
                 gateway.groq_clients,
                 gateway.groq_model,

@@ -82,7 +82,7 @@ export function RecoveryConsole() {
       </div>
 
       {/* Pipeline Stages */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 relative z-10">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 relative z-10 min-h-0">
         <div className="space-y-0 relative">
           {phases.map((p, index) => {
             const state = lifecycle[p.phase];

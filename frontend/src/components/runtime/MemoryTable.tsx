@@ -14,16 +14,16 @@ export function MemoryTable() {
 
   return (
     <>
-      <div className="bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl overflow-hidden relative z-0">
-        <div className="p-4 border-b border-border/50 bg-background/50">
+      <div className="bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl overflow-hidden relative z-0 flex flex-col h-full">
+        <div className="p-4 border-b border-border/50 bg-background/50 flex-shrink-0">
           <h2 className="text-lg font-bold font-sans tracking-tight text-foreground">Episodic Memory Bank</h2>
           <p className="text-xs text-muted-foreground font-sans mt-1">Historical resolution strategies and outcome telemetry.</p>
         </div>
         
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-border/50 bg-background/20 text-xs font-mono uppercase tracking-widest text-muted-foreground">
+        <div className="flex-1 overflow-auto custom-scrollbar min-h-0">
+          <table className="w-full text-left border-collapse relative">
+            <thead className="sticky top-0 z-10">
+              <tr className="border-b border-border/50 bg-background/90 backdrop-blur-md text-xs font-mono uppercase tracking-widest text-muted-foreground">
                 <th className="p-4 font-normal">Memory ID</th>
                 <th className="p-4 font-normal">Divergence Type</th>
                 <th className="p-4 font-normal">Applied Strategy</th>
