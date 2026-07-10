@@ -41,14 +41,14 @@ class LLMGateway:
             base_url="https://api.groq.com/openai/v1",
             api_key=os.environ.get("GROQ_API_KEY")
         )
-        self.groq_model = "llama3-8b-8192"
+        self.groq_model = "llama-3.1-8b-instant"
 
         # 4. OpenRouter (Fallback / Routing)
         self.openrouter_client = AsyncOpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=os.environ.get("OPENROUTER_API_KEY"),
         )
-        self.openrouter_model = "meta-llama/llama-3.1-8b-instruct:free"
+        self.openrouter_model = "meta-llama/llama-3.2-3b-instruct:free"
 
     async def interpret_event(self, event_type: str, scenario: Scenario) -> str:
         """Uses Gemini for strong structured reasoning and event interpretation"""
