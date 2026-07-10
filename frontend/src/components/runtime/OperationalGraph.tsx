@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useEffect, useState } from "react";
-import { ReactFlow, Background, BackgroundVariant, Controls, MiniMap, Node, Edge, useNodesState, useEdgesState } from "@xyflow/react";
+import { ReactFlow, ReactFlowProvider, useReactFlow, Background, BackgroundVariant, Controls, MiniMap, Node, Edge, useNodesState, useEdgesState } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import dagre from "dagre";
 
@@ -45,9 +45,10 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = "TB") => 
   return { nodes: layoutedNodes, edges };
 };
 
-export function OperationalGraph() {
+function OperationalGraphInner() {
   const missions = useRuntimeStore((state) => state.missions);
   const resources = useRuntimeStore((state) => state.resources);
+  const { fitView } = useReactFlow();
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -132,6 +133,16 @@ export function OperationalGraph() {
     }
   }, [missions, resources, setNodes, setEdges]);
 
+  // Fit view automatically when nodes change
+  useEffect(() => {
+    if (nodes.length > 0) {
+      const timeoutId = setTimeout(() => {
+        fitView({ padding: 0.2, duration: 800 });
+      }, 50);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [nodes, fitView]);
+
   return (
     <div className="w-full h-full relative">
       <div className="absolute top-4 left-4 z-10 bg-background/50 backdrop-blur-md p-3 rounded-lg border border-border/50 shadow-neu-raised">
@@ -148,11 +159,10 @@ export function OperationalGraph() {
         fitView
         fitViewOptions={{ padding: 0.2 }}
         className="bg-card/10"
-        proOptions={{ hideAttribution: true }} // Hides the default attribution for a cleaner OS look
+        proOptions={{ hideAttribution: true }}
       >
         <Background color="#434343" variant={BackgroundVariant.Dots} gap={24} size={2} />
 
-        {/* Sleek MiniMap for navigation */}
         <MiniMap
           nodeColor={(node) => {
             if (node.type === "missionNode") return "#6C63FF";
@@ -166,5 +176,13 @@ export function OperationalGraph() {
         <Controls className="fill-foreground bg-card border-border shadow-neu-raised rounded-md overflow-hidden" />
       </ReactFlow>
     </div>
+  );
+}
+
+export function OperationalGraph() {
+  return (
+    <ReactFlowProvider>
+      <OperationalGraphInner />
+    </ReactFlowProvider>
   );
 }

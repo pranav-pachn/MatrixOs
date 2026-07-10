@@ -41,103 +41,12 @@ async def startup_event():
 
 ALLOWED_SCENARIOS = ["airport", "hospital-er", "warehouse-hub"]
 
-@app.get("/api/scenarios", response_model=List[AdapterModel])
-async def get_scenarios():
-    return [
-        {
-            "id": "airport",
-            "name": "Airport Hub",
-            "description": "Aircraft turnaround and ground operations",
-            "status": "live",
-            "href": "/playground/airport"
-        },
-        {
-            "id": "hospital-er",
-            "name": "Emergency Room",
-            "description": "Patient triage and resource allocation",
-            "status": "coming-soon",
-            "href": "/playground/hospital-er"
-        },
-        {
-            "id": "warehouse-hub",
-            "name": "Fulfillment Hub",
-            "description": "Inventory routing and robotic fleets",
-            "status": "coming-soon",
-            "href": "/playground/warehouse-hub"
-        }
-    ]
+# ==========================================
+# GATEWAY ROUTER (NEW ARCHITECTURE)
+# ==========================================
+from gateway.routers.runtime import router as runtime_router
+app.include_router(runtime_router, prefix="/api/v1/runtime")
 
-@app.get("/api/scenarios/{scenario_id}/state", response_model=Scenario)
-async def get_world_state(scenario_id: str):
-    if scenario_id not in ALLOWED_SCENARIOS:
-        raise HTTPException(status_code=400, detail="Invalid scenario ID")
-    return await state_manager.get_scenario(scenario_id)
-
-@app.get("/api/scenarios/{scenario_id}/metrics", response_model=List[AdapterMetric])
-async def get_metrics(scenario_id: str):
-    if scenario_id not in ALLOWED_SCENARIOS:
-        raise HTTPException(status_code=400, detail="Invalid scenario ID")
-    adapter = get_adapter(scenario_id)
-    if not adapter:
-        raise HTTPException(status_code=404, detail="Adapter not found")
-    return adapter.metrics()
-
-@app.get("/api/scenarios/{scenario_id}/invariants")
-async def get_invariants(scenario_id: str):
-    """Returns a dry-run of all invariants against the current world state."""
-    from app.invariants.engine import InvariantEngine
-    
-    if scenario_id not in ALLOWED_SCENARIOS:
-        raise HTTPException(status_code=400, detail="Invalid scenario ID")
-        
-    adapter = get_adapter(scenario_id)
-    if not adapter:
-        raise HTTPException(status_code=404, detail="Scenario adapter not found")
-        
-    state = await state_manager.get_scenario(scenario_id)
-    if not state:
-        raise HTTPException(status_code=404, detail="Scenario state not found")
-        
-    engine = InvariantEngine(adapter.get_rules())
-    report = engine.validate(state, []) # empty actions = pure state check
-    return report
-
-@app.get("/api/scenarios/{scenario_id}/runtime-metrics", response_model=RuntimeMetrics)
-async def get_runtime_metrics(scenario_id: str):
-    if scenario_id not in ALLOWED_SCENARIOS:
-        raise HTTPException(status_code=400, detail="Invalid scenario ID")
-    current_state = await state_manager.get_scenario(scenario_id)
-    return compute_metrics(current_state)
-
-@app.get("/api/scenarios/{scenario_id}/constraints", response_model=List[ConstraintRule])
-async def get_constraints(scenario_id: str):
-    adapter = get_adapter(scenario_id)
-    if not adapter:
-        raise HTTPException(status_code=404, detail="Adapter not found")
-    return adapter.constraints()
-
-@app.get("/api/scenarios/{scenario_id}/events", response_model=List[AdapterEvent])
-async def get_events(scenario_id: str):
-    adapter = get_adapter(scenario_id)
-    if not adapter:
-        raise HTTPException(status_code=404, detail="Adapter not found")
-    return adapter.events()
-
-@app.get("/api/scenarios/{scenario_id}/events/replay")
-async def get_replay(scenario_id: str):
-    if scenario_id not in ALLOWED_SCENARIOS:
-        raise HTTPException(status_code=400, detail="Invalid scenario ID")
-    return [e.model_dump() for e in runtime_broadcaster.get_replay(scenario_id)]
-
-@app.post("/api/scenarios/{scenario_id}/execute", response_model=Scenario)
-async def execute_plan(scenario_id: str, plan: Dict[str, Any]):
-    adapter = get_adapter(scenario_id)
-    if not adapter:
-        raise HTTPException(status_code=404, detail="Adapter not found")
-    current_state = await state_manager.get_scenario(scenario_id)
-    new_state = adapter.execute(plan, current_state)
-    await state_manager.apply_recovery_actions(scenario_id, new_state)
-    return new_state
 
 @app.get("/api/memory/{disruption_type}/stats", response_model=MemoryStats)
 async def get_memory_stats(disruption_type: str):
@@ -163,66 +72,4 @@ async def websocket_endpoint(websocket: WebSocket, scenario_id: str):
     except WebSocketDisconnect:
         manager.disconnect(websocket, scenario_id)
 
-@app.post("/api/events/inject", response_model=InjectEventResponse)
-async def inject_event(request: InjectEventRequest, background_tasks: BackgroundTasks):
-    if request.scenarioId not in ALLOWED_SCENARIOS:
-        raise HTTPException(status_code=400, detail="Invalid scenario ID")
-        
-    event_id = f"evt_{uuid.uuid4().hex[:8]}"
-    divergence_id = f"div_{uuid.uuid4().hex[:8]}"
-    
-    divergence = Divergence(
-        id=divergence_id,
-        eventId=event_id,
-        expectedState="Normal operations",
-        actualState=f"Divergence detected: {request.type}",
-        severity="critical",
-        detectedAt=datetime.datetime.utcnow().isoformat()
-    )
-    
-    # Add to state manager
-    await state_manager.add_divergence(request.scenarioId, divergence)
-    
-    # Broadcast via RuntimeBroadcaster
-    event = RuntimeEvent(
-        id=event_id,
-        type="runtime.divergence.detected",
-        timestamp=datetime.datetime.utcnow().isoformat(),
-        payload={"event": request.type}
-    )
-    await runtime_broadcaster.publish(request.scenarioId, event)
-    
-    # Trigger the AI Recovery Loop in the background
-    background_tasks.add_task(run_recovery_loop, request.scenarioId, request.type, divergence_id)
 
-    return InjectEventResponse(
-        status="accepted",
-        eventId=event_id,
-        divergenceId=divergence_id,
-        recoveryJobId=f"job_{uuid.uuid4().hex[:8]}"
-    )
-
-class PlanRequest(BaseModel):
-    event_type: str
-
-@app.post("/api/scenarios/{scenario_id}/plan")
-async def generate_plan(scenario_id: str, request: PlanRequest):
-    if scenario_id not in ALLOWED_SCENARIOS:
-        raise HTTPException(status_code=400, detail="Invalid scenario ID")
-    
-    from app.planner.planner_service import planner_service
-    try:
-        response = await planner_service.plan(scenario_id, request.event_type)
-        return response
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-class OptimizeRequest(BaseModel):
-    event_type: str
-    plan_id: str
-
-@app.post("/api/scenarios/{scenario_id}/optimize")
-async def optimize_plan(scenario_id: str, request: OptimizeRequest):
-    if scenario_id not in ALLOWED_SCENARIOS:
-        raise HTTPException(status_code=400, detail="Invalid scenario ID")
-    raise HTTPException(status_code=501, detail="Standalone optimization inspection coming soon. Currently runs in recovery loop.")

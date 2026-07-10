@@ -6,30 +6,126 @@ export const hospitalScenario: Scenario = {
   name: "Hospital ER",
   missions: [
     {
-      id: "MSN-501",
-      name: "Trauma Code T-14",
-      type: "Emergency",
-      status: "diverged",
-      priority: 1,
-      deadline: "2026-07-09T18:05:00.000Z",
-      tasks: [
-        { id: "t1", name: "Triage Assessment", type: "medical", status: "complete", duration: 5, dependencies: [] },
-        { id: "t2", name: "CT Scan", type: "imaging", status: "pending", duration: 15, dependencies: ["t1"] }
-      ],
+        "id": "MSN-501",
+        "name": "Trauma Code T-14",
+        "type": "Emergency",
+        "status": "diverged",
+        "priority": 1,
+        "deadline": "2026-07-09T18:05:00.000Z",
+        "tasks": [
+            {
+                "id": "t1",
+                "name": "Triage Assessment",
+                "type": "medical",
+                "status": "COMPLETED",
+                "duration": 5,
+                "assignedResourceId": "RES-H2",
+                "dependencies": []
+            },
+            {
+                "id": "t2",
+                "name": "CT Scan",
+                "type": "imaging",
+                "status": "PENDING",
+                "duration": 15,
+                "assignedResourceId": "RES-H1",
+                "dependencies": [
+                    "t1"
+                ]
+            }
+        ]
     },
     {
-      id: "MSN-502",
-      name: "Ambulance Inbound",
-      type: "Arrival",
-      status: "in-progress",
-      priority: 2,
-      deadline: "2026-07-09T18:15:00.000Z",
-      tasks: [
-        { id: "t1", name: "Bay Assign", type: "logistics", status: "complete", duration: 2, dependencies: [] },
-        { id: "t2", name: "Patient Transfer", type: "medical", status: "active", duration: 5, dependencies: ["t1"] }
-      ],
+        "id": "MSN-502",
+        "name": "Ambulance Inbound",
+        "type": "Arrival",
+        "status": "in-progress",
+        "priority": 2,
+        "deadline": "2026-07-09T18:15:00.000Z",
+        "tasks": [
+            {
+                "id": "t1",
+                "name": "Bay Assign",
+                "type": "logistics",
+                "status": "COMPLETED",
+                "duration": 2,
+                "assignedResourceId": null,
+                "dependencies": []
+            },
+            {
+                "id": "t2",
+                "name": "Patient Transfer",
+                "type": "medical",
+                "status": "RUNNING",
+                "duration": 5,
+                "assignedResourceId": "RES-H3",
+                "dependencies": [
+                    "t1"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "MSN-503",
+        "name": "Emergency OR Prep",
+        "type": "Surgery",
+        "status": "in-progress",
+        "priority": 1,
+        "deadline": "2026-07-09T18:20:00.000Z",
+        "tasks": [
+            {
+                "id": "t1",
+                "name": "Anesthesia",
+                "type": "medical",
+                "status": "COMPLETED",
+                "duration": 10,
+                "assignedResourceId": "RES-H3",
+                "dependencies": []
+            },
+            {
+                "id": "t2",
+                "name": "Incision",
+                "type": "medical",
+                "status": "PENDING",
+                "duration": 60,
+                "assignedResourceId": null,
+                "dependencies": [
+                    "t1"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "MSN-504",
+        "name": "ICU Intake",
+        "type": "Intensive Care",
+        "status": "normal",
+        "priority": 2,
+        "deadline": "2026-07-09T19:00:00.000Z",
+        "tasks": [
+            {
+                "id": "t1",
+                "name": "Vitals Monitoring",
+                "type": "medical",
+                "status": "COMPLETED",
+                "duration": 5,
+                "assignedResourceId": null,
+                "dependencies": []
+            },
+            {
+                "id": "t2",
+                "name": "Ventilator Setup",
+                "type": "medical",
+                "status": "PENDING",
+                "duration": 15,
+                "assignedResourceId": "RES-H4",
+                "dependencies": [
+                    "t1"
+                ]
+            }
+        ]
     }
-  ],
+],
   resources: [
     { id: "RES-H1", type: "CT Scanner", status: "failed", name: "CT-Main" },
     { id: "RES-H2", type: "Trauma Bay", status: "occupied", name: "Bay 3" },

@@ -16,7 +16,7 @@
           "type": "logistics",
           "status": "COMPLETED",
           "duration": 25,
-          "assignedResourceId": null,
+          "assignedResourceId": "RES-W3",
           "dependencies": []
         },
         {
@@ -25,7 +25,7 @@
           "type": "loading",
           "status": "PENDING",
           "duration": 15,
-          "assignedResourceId": null,
+          "assignedResourceId": "RES-W4",
           "dependencies": [
             "t1"
           ]
@@ -46,7 +46,7 @@
           "type": "loading",
           "status": "COMPLETED",
           "duration": 10,
-          "assignedResourceId": null,
+          "assignedResourceId": "RES-W2",
           "dependencies": []
         },
         {
@@ -55,7 +55,67 @@
           "type": "logistics",
           "status": "RUNNING",
           "duration": 30,
+          "assignedResourceId": "RES-W3",
+          "dependencies": [
+            "t1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MSN-W90",
+      "name": "Robot Dispatch",
+      "type": "Fulfillment",
+      "status": "diverged",
+      "priority": 1,
+      "deadline": "2026-07-09T18:20:00.000Z",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Path Calculation",
+          "type": "logistics",
+          "status": "COMPLETED",
+          "duration": 2,
           "assignedResourceId": null,
+          "dependencies": []
+        },
+        {
+          "id": "t2",
+          "name": "Transport",
+          "type": "logistics",
+          "status": "PENDING",
+          "duration": 15,
+          "assignedResourceId": "RES-W1",
+          "dependencies": [
+            "t1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MSN-W91",
+      "name": "Shipment Route 7",
+      "type": "Fulfillment",
+      "status": "normal",
+      "priority": 2,
+      "deadline": "2026-07-09T19:00:00.000Z",
+      "tasks": [
+        {
+          "id": "t1",
+          "name": "Staging",
+          "type": "logistics",
+          "status": "COMPLETED",
+          "duration": 5,
+          "assignedResourceId": null,
+          "dependencies": []
+        },
+        {
+          "id": "t2",
+          "name": "Loading",
+          "type": "loading",
+          "status": "PENDING",
+          "duration": 15,
+          "assignedResourceId": "RES-W2",
           "dependencies": [
             "t1"
           ]

@@ -6,30 +6,126 @@ export const warehouseScenario: Scenario = {
   name: "Warehouse",
   missions: [
     {
-      id: "MSN-W88",
-      name: "Outbound Freight 404",
-      type: "Fulfillment",
-      status: "diverged",
-      priority: 1,
-      deadline: "2026-07-09T20:00:00.000Z",
-      tasks: [
-        { id: "t1", name: "Pallet Picking", type: "logistics", status: "complete", duration: 25, dependencies: [] },
-        { id: "t2", name: "Dock Loading", type: "loading", status: "pending", duration: 15, dependencies: ["t1"] }
-      ],
+        "id": "MSN-W88",
+        "name": "Outbound Freight 404",
+        "type": "Fulfillment",
+        "status": "diverged",
+        "priority": 1,
+        "deadline": "2026-07-09T20:00:00.000Z",
+        "tasks": [
+            {
+                "id": "t1",
+                "name": "Pallet Picking",
+                "type": "logistics",
+                "status": "COMPLETED",
+                "duration": 25,
+                "assignedResourceId": "RES-W3",
+                "dependencies": []
+            },
+            {
+                "id": "t2",
+                "name": "Dock Loading",
+                "type": "loading",
+                "status": "PENDING",
+                "duration": 15,
+                "assignedResourceId": "RES-W4",
+                "dependencies": [
+                    "t1"
+                ]
+            }
+        ]
     },
     {
-      id: "MSN-W89",
-      name: "Inbound Restock A2",
-      type: "Inventory",
-      status: "in-progress",
-      priority: 2,
-      deadline: "2026-07-09T21:30:00.000Z",
-      tasks: [
-        { id: "t1", name: "Unload", type: "loading", status: "complete", duration: 10, dependencies: [] },
-        { id: "t2", name: "Sort", type: "logistics", status: "active", duration: 30, dependencies: ["t1"] }
-      ],
+        "id": "MSN-W89",
+        "name": "Inbound Restock A2",
+        "type": "Inventory",
+        "status": "in-progress",
+        "priority": 2,
+        "deadline": "2026-07-09T21:30:00.000Z",
+        "tasks": [
+            {
+                "id": "t1",
+                "name": "Unload",
+                "type": "loading",
+                "status": "COMPLETED",
+                "duration": 10,
+                "assignedResourceId": "RES-W2",
+                "dependencies": []
+            },
+            {
+                "id": "t2",
+                "name": "Sort",
+                "type": "logistics",
+                "status": "RUNNING",
+                "duration": 30,
+                "assignedResourceId": "RES-W3",
+                "dependencies": [
+                    "t1"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "MSN-W90",
+        "name": "Robot Dispatch",
+        "type": "Fulfillment",
+        "status": "diverged",
+        "priority": 1,
+        "deadline": "2026-07-09T18:20:00.000Z",
+        "tasks": [
+            {
+                "id": "t1",
+                "name": "Path Calculation",
+                "type": "logistics",
+                "status": "COMPLETED",
+                "duration": 2,
+                "assignedResourceId": null,
+                "dependencies": []
+            },
+            {
+                "id": "t2",
+                "name": "Transport",
+                "type": "logistics",
+                "status": "PENDING",
+                "duration": 15,
+                "assignedResourceId": "RES-W1",
+                "dependencies": [
+                    "t1"
+                ]
+            }
+        ]
+    },
+    {
+        "id": "MSN-W91",
+        "name": "Shipment Route 7",
+        "type": "Fulfillment",
+        "status": "normal",
+        "priority": 2,
+        "deadline": "2026-07-09T19:00:00.000Z",
+        "tasks": [
+            {
+                "id": "t1",
+                "name": "Staging",
+                "type": "logistics",
+                "status": "COMPLETED",
+                "duration": 5,
+                "assignedResourceId": null,
+                "dependencies": []
+            },
+            {
+                "id": "t2",
+                "name": "Loading",
+                "type": "loading",
+                "status": "PENDING",
+                "duration": 15,
+                "assignedResourceId": "RES-W2",
+                "dependencies": [
+                    "t1"
+                ]
+            }
+        ]
     }
-  ],
+],
   resources: [
     { id: "RES-W1", type: "Autonomous Bot", status: "failed", name: "Bot 004" },
     { id: "RES-W2", type: "Loading Dock", status: "occupied", name: "Dock B" },

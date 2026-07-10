@@ -8,7 +8,7 @@ export function TriggerEventPanel() {
   const activeScenarioId = useRuntimeStore((state) => state.activeScenarioId);
   const [injectingId, setInjectingId] = useState<string | null>(null);
 
-  const triggers = [
+  const airportTriggers = [
     { id: "fuel", label: "Fuel Truck Failure", icon: Lightning, glow: "group-hover:shadow-[0_0_20px_rgba(255,77,77,0.4)] group-hover:border-destructive/60", iconColor: "text-destructive group-hover:text-destructive" },
     { id: "weather", label: "Heavy Rain (Cat 2)", icon: CloudRain, glow: "group-hover:shadow-[0_0_20px_rgba(41,182,246,0.4)] group-hover:border-chart-3/60", iconColor: "text-chart-3 group-hover:text-chart-3" },
     { id: "gate", label: "Gate B12 Blocked", icon: WarningCircle, glow: "group-hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] group-hover:border-chart-2/60", iconColor: "text-chart-2 group-hover:text-chart-2" },
@@ -16,6 +16,19 @@ export function TriggerEventPanel() {
     { id: "emergency", label: "Emergency Arrival", icon: Ambulance, glow: "group-hover:shadow-[0_0_20px_rgba(108,99,255,0.4)] group-hover:border-primary/60", iconColor: "text-primary group-hover:text-primary" },
   ];
 
+  const hospitalTriggers = [
+    { id: "EmergencyPatient", label: "Emergency Patient Arrival", icon: Ambulance, glow: "group-hover:shadow-[0_0_20px_rgba(255,77,77,0.4)] group-hover:border-destructive/60", iconColor: "text-destructive group-hover:text-destructive" },
+    { id: "DoctorUnavailable", label: "Doctor Unavailable", icon: Users, glow: "group-hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] group-hover:border-chart-2/60", iconColor: "text-chart-2 group-hover:text-chart-2" },
+    { id: "MRIFailure", label: "MRI Failure", icon: Lightning, glow: "group-hover:shadow-[0_0_20px_rgba(41,182,246,0.4)] group-hover:border-chart-3/60", iconColor: "text-chart-3 group-hover:text-chart-3" },
+  ];
+
+  const warehouseTriggers = [
+    { id: "ForkliftFailure", label: "Forklift Breakdown", icon: Lightning, glow: "group-hover:shadow-[0_0_20px_rgba(255,77,77,0.4)] group-hover:border-destructive/60", iconColor: "text-destructive group-hover:text-destructive" },
+    { id: "DockBlocked", label: "Dock Blocked", icon: WarningCircle, glow: "group-hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] group-hover:border-chart-2/60", iconColor: "text-chart-2 group-hover:text-chart-2" },
+    { id: "InventoryShortage", label: "Inventory Shortage", icon: Users, glow: "group-hover:shadow-[0_0_20px_rgba(41,182,246,0.4)] group-hover:border-chart-3/60", iconColor: "text-chart-3 group-hover:text-chart-3" },
+  ];
+
+  const triggers = activeScenarioId === "hospital-er" ? hospitalTriggers : activeScenarioId === "warehouse-hub" ? warehouseTriggers : airportTriggers;
   return (
     <div className="flex flex-col h-full bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl p-6 relative overflow-hidden">
       
@@ -39,10 +52,10 @@ export function TriggerEventPanel() {
               onClick={async () => {
                 try {
                   setInjectingId(trigger.id);
-                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/events/inject`, {
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/v1/runtime/${activeScenarioId}/events`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ scenarioId: activeScenarioId, type: trigger.id })
+                    body: JSON.stringify({ event: trigger.id })
                   });
                   if (!res.ok) throw new Error("Failed to inject event");
                 } catch (e) {

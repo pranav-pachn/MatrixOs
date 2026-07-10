@@ -16,7 +16,7 @@
           "type": "pax",
           "status": "COMPLETED",
           "duration": 15,
-          "assignedResourceId": null,
+          "assignedResourceId": "RES-02",
           "dependencies": []
         },
         {
@@ -25,7 +25,7 @@
           "type": "fuel",
           "status": "PENDING",
           "duration": 20,
-          "assignedResourceId": null,
+          "assignedResourceId": "RES-01",
           "dependencies": []
         }
       ]
@@ -44,7 +44,7 @@
           "type": "gate",
           "status": "COMPLETED",
           "duration": 5,
-          "assignedResourceId": null,
+          "assignedResourceId": "RES-03",
           "dependencies": []
         },
         {

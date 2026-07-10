@@ -84,15 +84,13 @@ export const useRuntimeStore = create<RuntimeState>((set, get) => ({
   loadScenario: async (scenarioId: string) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/scenarios/${scenarioId}/state`);
-      if (!response.ok) throw new Error("Failed to fetch scenario state");
-      const scenario: Scenario = await response.json();
+      // Use the new Runtime Gateway API
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/v1/runtime/${scenarioId}`);
+      if (!response.ok) throw new Error("Failed to fetch runtime snapshot");
       
-      const metricsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8000'}/api/scenarios/${scenarioId}/metrics`);
-      let metrics = null;
-      if (metricsRes.ok) {
-        metrics = await metricsRes.json();
-      }
+      const snapshot = await response.json();
+      const scenario = snapshot.world;
+      const metrics = snapshot.metrics;
 
       set({
         activeScenarioId: scenarioId,
