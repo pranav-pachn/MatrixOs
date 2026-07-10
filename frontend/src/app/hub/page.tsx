@@ -1,42 +1,16 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { EnvironmentGrid } from "@/components/hub/EnvironmentGrid";
 
 export default function HubPage() {
   return (
     <div className="relative min-h-screen bg-[#000000] text-foreground font-sans selection:bg-primary/30 flex flex-col overflow-hidden">
 
-      {/* Subtle dark radial gradient background */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-primary/8 blur-[180px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-indigo-900/10 blur-[150px] rounded-full" />
-      </div>
-
-      {/* Minimal top bar — back link + branding only */}
-      <div className="relative z-10 flex items-center justify-between px-8 py-6">
-        <Link
-          href="/"
-          className="group inline-flex items-center gap-2 text-white/30 hover:text-white/70 transition-colors text-sm font-sans"
-        >
-          <ArrowLeft
-            size={16}
-            weight="bold"
-            className="group-hover:-translate-x-0.5 transition-transform"
-          />
-          Back to site
-        </Link>
-
-        {/* Minimal logo */}
-        <div className="flex items-center space-x-2 opacity-40">
-          <div className="w-5 h-5 rounded bg-foreground flex items-center justify-center">
-            <div className="w-2.5 h-2.5 rounded-sm bg-background" />
-          </div>
-          <span className="text-sm font-bold tracking-tight">MatrixOS</span>
-        </div>
+      {/* Subtle dark radial gradient background to anchor the cards */}
+      <div className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
+        <div className="absolute w-[800px] h-[800px] bg-[radial-gradient(ellipse_at_center,rgba(82,39,255,0.06)_0%,transparent_60%)]" />
       </div>
 
       {/* Main content — vertically centered in remaining space */}
@@ -53,10 +27,10 @@ export default function HubPage() {
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
             <span>Operational Runtime</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white font-sans mb-3">
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tighter text-white font-sans mb-4">
             Active Environments
           </h1>
-          <p className="text-white/35 text-base max-w-md mx-auto font-sans leading-relaxed">
+          <p className="text-white/40 text-lg max-w-md mx-auto font-sans leading-relaxed">
             Select an environment to enter its runtime graph, or create a new one.
           </p>
         </motion.div>

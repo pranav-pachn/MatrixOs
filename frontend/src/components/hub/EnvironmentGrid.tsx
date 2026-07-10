@@ -15,6 +15,7 @@ import {
   Gear,
   WifiHigh,
   Leaf,
+  AirplaneTilt,
   X,
   ArrowRight,
 } from "@phosphor-icons/react/dist/ssr";
@@ -36,6 +37,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Gear: <Gear size={32} weight="duotone" />,
   WifiHigh: <WifiHigh size={32} weight="duotone" />,
   Leaf: <Leaf size={32} weight="duotone" />,
+  AirplaneTilt: <AirplaneTilt size={32} weight="duotone" />,
 };
 
 interface Environment {
@@ -49,6 +51,15 @@ interface Environment {
 }
 
 const DEFAULT_ENVIRONMENTS: Environment[] = [
+  {
+    id: "airport-hub",
+    name: "Airport Hub",
+    description: "Aviation turnaround constraint validation.",
+    iconKey: "AirplaneTilt",
+    status: "live",
+    href: "/playground/airport",
+    isDefault: true,
+  },
   {
     id: "hospital-er",
     name: "Hospital ER",
@@ -153,16 +164,16 @@ export function EnvironmentGrid() {
   return (
     <>
       {/* Environment cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <AnimatePresence mode="popLayout">
-          {environments.map((env) => (
+          {environments.map((env, i) => (
             <motion.div
               key={env.id}
               layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.85 }}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.5, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
             >
               <EnvironmentCard
                 env={env}
@@ -172,8 +183,13 @@ export function EnvironmentGrid() {
           ))}
         </AnimatePresence>
 
-        {/* Add card — always at the end */}
-        <motion.div layout transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}>
+        {/* Add card — always at the end, staggered after environments */}
+        <motion.div 
+          layout 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: environments.length * 0.15, ease: [0.16, 1, 0.3, 1] }}
+        >
           <AddEnvironmentCard onClick={() => setIsModalOpen(true)} />
         </motion.div>
       </div>
@@ -190,18 +206,18 @@ export function EnvironmentGrid() {
           {[
             {
               step: "01",
-              title: "Create",
-              body: "Click \"Add Environment\" and give it a name, description, and icon. Choose Live or Coming Soon as its initial status.",
+              title: "Select",
+              body: "Select an existing environment to view its runtime graph.",
             },
             {
               step: "02",
-              title: "Configure",
-              body: "Each environment maps to a runtime adapter at /playground/<slug>. The adapter defines the constraint graph and resource model.",
+              title: "Create",
+              body: "Click “Add Environment” to configure a new adapter.",
             },
             {
               step: "03",
-              title: "Manage",
-              body: "Custom environments can be removed at any time by hovering the card and clicking the dismiss icon. Default environments are protected.",
+              title: "Execute",
+              body: "Save and enter the environment to begin execution.",
             },
           ].map(({ step, title, body }) => (
             <div key={step} className="flex gap-4">
