@@ -65,7 +65,7 @@ export function LandingFooter() {
               {['Runtime', 'Methodology', 'Documentation', 'Roadmap', 'Changelog'].map((item) => (
                 <li key={item}>
                   <Link 
-                    href={item === 'Documentation' ? '/documentation/getting-started' : '#'} 
+                    href={item === 'Documentation' ? '/documentation/getting-started' : item === 'Methodology' ? '/#methodology' : '#'} 
                     className="text-white/50 hover:text-white text-[15px] transition-colors duration-[200ms] relative inline-block after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-primary hover:after:origin-bottom-left hover:after:scale-x-100 after:transition-transform after:duration-[200ms]"
                   >
                     {item}

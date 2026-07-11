@@ -29,7 +29,7 @@ const features = [
 
 export function ArchitectureTrust() {
   return (
-    <section className="w-full max-w-5xl mx-auto px-6 py-32 flex flex-col items-center justify-center text-center">
+    <section id="methodology" className="w-full max-w-5xl mx-auto px-6 py-32 flex flex-col items-center justify-center text-center">
       
       {/* Header */}
       <motion.div 

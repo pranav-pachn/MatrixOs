@@ -41,11 +41,16 @@ export function RecoveryConsole() {
   let totalLatency = 0;
   let activePhase = "IDLE";
   let isFailed = false;
+  let failureMessage = "Autonomous pipeline exhausted all options. Manual intervention required to resolve the disruption.";
 
   Object.entries(lifecycle).forEach(([key, state]) => {
     if (state.duration) totalLatency += state.duration;
     if (state.status === "running") activePhase = key;
-    if (state.status === "failed") isFailed = true;
+    if (state.status === "failed") {
+      isFailed = true;
+      // Use the backend's failure message if provided
+      if (state.message) failureMessage = state.message;
+    }
   });
 
   if (activePhase === "IDLE" && lifecycle["EXECUTING"].status === "success") {
@@ -182,7 +187,7 @@ export function RecoveryConsole() {
           <div>
             <h4 className="text-sm font-bold text-destructive">Recovery Failed</h4>
             <p className="text-xs text-destructive/80 mt-1">
-              Autonomous pipeline exhausted all options. Manual intervention required to resolve the disruption.
+              {failureMessage}
             </p>
           </div>
         </div>

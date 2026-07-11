@@ -33,7 +33,7 @@ export function LandingHeader() {
               <motion.div layoutId="nav-indicator" className="absolute -bottom-[14px] left-0 right-0 h-[2px] bg-primary rounded-t-full shadow-[0_-2px_10px_rgba(122,60,249,0.5)]" />
             )}
           </div>
-          <Link href="#" className="text-[14px] font-medium text-[#B8B8C2] hover:text-white transition-colors duration-[250ms] tracking-wide">Methodology</Link>
+          <Link href="/#methodology" className="text-[14px] font-medium text-[#B8B8C2] hover:text-white transition-colors duration-[250ms] tracking-wide">Methodology</Link>
           <div className="relative group">
             <Link href="/documentation/getting-started" className={`text-[14px] font-medium transition-colors duration-[250ms] tracking-wide ${isDocs ? "text-white" : "text-[#B8B8C2] group-hover:text-white"}`}>Documentation</Link>
             {isDocs && (
