@@ -26,8 +26,8 @@ export const airportScenario: Scenario = {
       deadline: "2026-07-09T19:30:00.000Z",
       tasks: [
         { id: "t1", name: "Gate Assign", type: "gate", status: "complete", duration: 5, assignedResourceId: "RES-03", dependencies: [] },
-        { id: "t2", name: "Taxi", type: "ground", status: "active", duration: 10, assignedResourceId: null, dependencies: ["t1"] },
-        { id: "t3", name: "Block In", type: "ground", status: "pending", duration: 2, assignedResourceId: null, dependencies: ["t2"] }
+        { id: "t2", name: "Taxi", type: "ground", status: "active", duration: 10, assignedResourceId: undefined, dependencies: ["t1"] },
+        { id: "t3", name: "Block In", type: "ground", status: "pending", duration: 2, assignedResourceId: undefined, dependencies: ["t2"] }
       ],
     }
   ],
