@@ -203,12 +203,7 @@ export function RecoveryConsole() {
             </p>
           </div>
           
-          <div>
-            <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Planner Model</p>
-            <p className="text-sm font-bold text-foreground">
-              Groq Llama-3.1-8b
-            </p>
-          </div>
+
           <div>
             <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Solver Status</p>
             <p className={`text-sm font-bold ${lifecycle["OPTIMIZING"].status === "success" ? "text-chart-2" : "text-foreground"}`}>
