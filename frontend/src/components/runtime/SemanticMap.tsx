@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Graph, Node, ShareNetwork, MagnifyingGlass, Cpu } from "@phosphor-icons/react/dist/ssr";
+import { Graph, ShareNetwork, MagnifyingGlass, Cpu } from "@phosphor-icons/react/dist/ssr";
 
 // Mock Data for the Knowledge Graph
 const SEMANTIC_NODES = [
