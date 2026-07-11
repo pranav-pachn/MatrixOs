@@ -120,12 +120,72 @@ export function RecoveryConsole() {
                       {state.status === "success" ? "✓ " : ""}{state.message}
                     </motion.p>
                   )}
+                  {state.data && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      className="mt-2 space-y-2 overflow-hidden"
+                    >
+                      {state.data.plans && (
+                        <div className="flex flex-col gap-1.5 mt-2">
+                          {state.data.plans.map((plan: any, i: number) => (
+                            <div key={i} className="flex justify-between items-center text-[10px] bg-background/40 px-2 py-1.5 rounded border border-border/50">
+                              <span className="font-mono text-muted-foreground">{plan.id || `Plan ${i+1}`}</span>
+                              <span className="font-sans font-medium text-foreground truncate max-w-[120px] mx-2" title={plan.title}>{plan.title}</span>
+                              <div className="flex gap-2 font-mono">
+                                <span className="text-chart-2">{(plan.confidence * 100).toFixed(0)}%</span>
+                                <span className="text-chart-4">{plan.estimated_delay}m</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {state.data.optimized_plan && (
+                        <div className="bg-background/40 p-2 rounded border border-border/50 font-mono text-[10px] text-muted-foreground grid grid-cols-2 gap-1 mt-2">
+                          <div>Assignments: <span className="text-foreground">{state.data.optimized_plan.assignments?.length || 0}</span></div>
+                          <div>Makespan: <span className="text-chart-4">{state.data.optimized_plan.estimated_delay}m</span></div>
+                          <div>Utilization: <span className="text-foreground">{(state.data.optimized_plan.resource_utilization * 100).toFixed(0)}%</span></div>
+                          <div>Status: <span className="text-chart-2">{state.data.optimized_plan.solver_status || 'OPTIMAL'}</span></div>
+                        </div>
+                      )}
+                      
+                      {state.data.validation_result && (
+                        <div className="flex flex-col gap-1 mt-2">
+                          {state.data.validation_result.valid ? (
+                            <div className="flex items-center gap-1.5 text-[10px] bg-chart-2/10 text-chart-2 px-2 py-1 rounded border border-chart-2/20 font-mono">
+                              <CheckCircle2 className="w-3 h-3" /> All Constraints Passed
+                            </div>
+                          ) : (
+                            state.data.validation_result.errors?.map((err: string, i: number) => (
+                              <div key={i} className="flex items-center gap-1.5 text-[10px] bg-destructive/10 text-destructive px-2 py-1 rounded border border-destructive/20 font-mono leading-tight">
+                                <XCircle className="w-3 h-3 flex-shrink-0" /> {err}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
       </div>
+
+      {/* Failure Banner */}
+      {isFailed && (
+        <div className="bg-destructive/10 border-y border-destructive/30 p-4 relative z-10 flex items-start gap-3">
+          <XCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-sm font-bold text-destructive">Recovery Failed</h4>
+            <p className="text-xs text-destructive/80 mt-1">
+              Autonomous pipeline exhausted all options. Manual intervention required to resolve the disruption.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Status Footer */}
       <div className="bg-background/80 backdrop-blur-md border-t border-border/50 p-4 relative z-10">
@@ -146,7 +206,7 @@ export function RecoveryConsole() {
           <div>
             <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Planner Model</p>
             <p className="text-sm font-bold text-foreground">
-              Gemini 2.5 Flash
+              Groq Llama-3.1-8b
             </p>
           </div>
           <div>

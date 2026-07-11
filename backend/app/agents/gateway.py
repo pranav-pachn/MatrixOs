@@ -46,14 +46,7 @@ class LLMGateway:
             kwargs.setdefault('http_client', http_client)
             return [AsyncOpenAI(api_key=k, base_url=base_url, **kwargs) for k in keys_list]
 
-        # 1. Gemini (Event Interpretation)
-        self.gemini_clients = create_clients(
-            env_keys.get("GEMINI_API_KEY", []),
-            "https://generativelanguage.googleapis.com/v1beta/openai/"
-        )
-        self.gemini_model = "gemini-2.0-flash"
-
-        # 2. DeepSeek via NVIDIA (Planning / Reasoning)
+        # 1. DeepSeek via NVIDIA (Planning / Reasoning)
         self.deepseek_clients = create_clients(
             env_keys.get("DEEPSEEK_KEY", []),
             "https://integrate.api.nvidia.com/v1",

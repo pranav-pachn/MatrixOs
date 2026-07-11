@@ -1,5 +1,5 @@
 from fastapi import APIRouter, BackgroundTasks
-from typing import List
+from typing import List, Any
 
 from gateway.schemas import (
     RuntimeSnapshot, InjectEventRequest, InjectEventResponse, ScenarioListResponse
@@ -19,7 +19,7 @@ async def get_runtime_snapshot(runtime_id: str):
     """Get the complete Runtime Snapshot"""
     return await runtime_service.get_snapshot(runtime_id)
 
-@router.get("/{runtime_id}/metrics", response_model=List[AdapterMetric])
+@router.get("/{runtime_id}/metrics", response_model=Any)
 async def get_runtime_metrics(runtime_id: str):
     """Get just the runtime metrics"""
     return await runtime_service.get_metrics(runtime_id)

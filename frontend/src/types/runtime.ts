@@ -131,6 +131,7 @@ export interface PhaseState {
   status: RuntimePhaseStatus;
   message?: string;
   duration?: number;
+  data?: any;
 }
 
 

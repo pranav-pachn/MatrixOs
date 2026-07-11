@@ -16,7 +16,7 @@ class RuntimeSnapshot(BaseModel):
     metadata: AdapterMetadata
     runtime: RuntimeContext
     world: Scenario
-    metrics: Optional[List[AdapterMetric]] = None
+    metrics: Optional[Any] = None
 
 class InjectEventRequest(BaseModel):
     event: str

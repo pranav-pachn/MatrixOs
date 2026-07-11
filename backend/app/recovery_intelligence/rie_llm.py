@@ -38,13 +38,13 @@ class RecoveryLLM:
             )
             return RIEParser.parse(raw)
         except Exception as e:
-            print(f"RIE Primary (Gemini) failed: {e}. Trying fallback.")
+            print(f"RIE Primary (Groq) failed: {e}. Trying fallback.")
             
-        # Fallback 1: Groq
+        # Fallback 1: DeepSeek
         try:
             raw = await gateway._execute_with_retry(
-                gateway.groq_clients,
-                gateway.groq_model,
+                gateway.deepseek_clients,
+                gateway.deepseek_model,
                 prompt,
                 temperature=0.3,
                 max_tokens=1500
@@ -53,10 +53,10 @@ class RecoveryLLM:
         except Exception as e:
             print(f"RIE Fallback (DeepSeek) failed: {e}. Trying OpenRouter.")
             
-        # Fallback 2: Groq
+        # Fallback 2: OpenRouter
         raw = await gateway._execute_with_retry(
-            gateway.groq_clients,
-            gateway.groq_model,
+            gateway.openrouter_clients,
+            gateway.openrouter_model,
             prompt,
             temperature=0.3,
             max_tokens=1500

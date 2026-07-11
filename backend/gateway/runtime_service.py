@@ -49,7 +49,8 @@ class RuntimeService:
         adapter = get_adapter(runtime_id)
         adapter_name = adapter.__class__.__name__ if adapter else "UnknownAdapter"
         
-        metrics = adapter.metrics() if adapter else None
+        from app.runtime.metrics_service import compute_metrics
+        metrics = compute_metrics(world_state).model_dump()
         
         return RuntimeSnapshot(
             metadata=AdapterMetadata(
@@ -67,10 +68,11 @@ class RuntimeService:
         )
         
     async def get_metrics(self, runtime_id: str):
-        adapter = get_adapter(runtime_id)
-        if not adapter:
+        world_state = await state_manager.get_scenario(runtime_id)
+        if not world_state:
             raise HTTPException(status_code=404, detail="Runtime not found")
-        return adapter.metrics()
+        from app.runtime.metrics_service import compute_metrics
+        return compute_metrics(world_state).model_dump()
 
     async def inject_event(self, runtime_id: str, event_type: str, background_tasks: BackgroundTasks) -> InjectEventResponse:
         adapter = get_adapter(runtime_id)

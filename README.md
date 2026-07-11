@@ -179,18 +179,19 @@ matrixos/
 
 - [x] Shared World Model
 - [x] Runtime Architecture
-- [ ] Planner Agent
-- [ ] Recovery Agent
-- [ ] Invariant Engine
-- [ ] Airport Adapter
-- [ ] Runtime Console
-- [ ] Dynamic Recovery Demo
+- [x] Planner Agent
+- [x] Recovery Agent
+- [x] Invariant Engine
+- [x] Airport Adapter
+- [x] Hospital Adapter
+- [x] Warehouse Adapter
+- [x] Runtime Console
+- [x] Dynamic Recovery Demo
 
 ## Future
 
-- Hospital Adapter
-- Warehouse Adapter
 - Factory Adapter
+- Spaceport Adapter
 - Multi-runtime Coordination
 - Predictive Operational Intelligence
 

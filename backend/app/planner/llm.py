@@ -9,8 +9,8 @@ class PlannerLLM(ABC):
     async def generate(self, request: PlannerRequest) -> PlannerResponse:
         pass
 
-class GeminiPlanner(PlannerLLM):
-    """Primary Planner using Gemini 2.5 Flash (Thinking)"""
+class GroqPlanner(PlannerLLM):
+    """Primary Planner using Groq"""
     async def generate(self, request: PlannerRequest) -> PlannerResponse:
         system = PromptBuilder.build_system_prompt()
         user = PromptBuilder.build_user_message(request)
@@ -46,8 +46,8 @@ class DeepSeekPlanner(PlannerLLM):
         prompt = f"{system}\n\n{user}"
         
         raw = await gateway._execute_with_retry(
-            gateway.groq_clients,
-            gateway.groq_model,
+            gateway.deepseek_clients,
+            gateway.deepseek_model,
             prompt,
             temperature=0.2,
             max_tokens=2000
@@ -62,8 +62,8 @@ class OpenRouterPlanner(PlannerLLM):
         prompt = f"{system}\n\n{user}"
         
         raw = await gateway._execute_with_retry(
-            gateway.groq_clients,
-            gateway.groq_model,
+            gateway.openrouter_clients,
+            gateway.openrouter_model,
             prompt,
             temperature=0.2,
             max_tokens=2000

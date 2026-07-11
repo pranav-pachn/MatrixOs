@@ -14,13 +14,17 @@ from app.recovery_intelligence.rie_service import rie_service
 from app.recovery_intelligence.schemas import RecoveryRequest
 from memory.memory_service import operational_memory
 
-async def broadcast_phase(scenario_id: str, phase: RuntimePhase, status: str, message: str, duration: int = None):
+async def broadcast_phase(scenario_id: str, phase: RuntimePhase, status: str, message: str, duration: int = None, data: dict = None):
+    payload = {"message": message, "duration": duration}
+    if data:
+        payload["data"] = data
+        
     event = RuntimeEvent(
         id=str(uuid.uuid4()),
         type=f"runtime.phase.{status}",
         phase=phase,
         timestamp=datetime.datetime.utcnow().isoformat(),
-        payload={"message": message, "duration": duration}
+        payload=payload
     )
     await runtime_broadcaster.publish(scenario_id, event)
 
@@ -54,7 +58,7 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
             candidate_plans = planner_response.plans
             
             duration_ms = int((time.perf_counter() - start_time) * 1000)
-            await broadcast_phase(scenario_id, RuntimePhase.PLANNING, "completed", f"Generated {len(candidate_plans)} candidate strategies.", duration_ms)
+            await broadcast_phase(scenario_id, RuntimePhase.PLANNING, "completed", f"Generated {len(candidate_plans)} candidate strategies.", duration_ms, data={"plans": [p.model_dump() for p in candidate_plans]})
         else:
             # RIE ACTIVATION
             start_time = time.perf_counter()
@@ -108,7 +112,7 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
         failed_strategy_title = best_plan.title
         
         duration_ms = int((time.perf_counter() - start_time) * 1000)
-        await broadcast_phase(scenario_id, RuntimePhase.POLICY, "completed", f"Selected Strategy: {best_plan.title}", duration_ms)
+        await broadcast_phase(scenario_id, RuntimePhase.POLICY, "completed", f"Selected Strategy: {best_plan.title}", duration_ms, data={"selected_plan": best_plan.model_dump()})
 
         # Phase 5: OPTIMIZING
         start_time = time.perf_counter()
@@ -147,7 +151,7 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
                 await broadcast_phase(scenario_id, RuntimePhase.COMPLETED, "failed", "Exhausted RIE retries. Manual intervention required.", duration_ms)
                 return
         
-        await broadcast_phase(scenario_id, RuntimePhase.OPTIMIZING, "completed", f"Assignments optimal. Delay: {optimized_plan.estimated_delay}m", duration_ms)
+        await broadcast_phase(scenario_id, RuntimePhase.OPTIMIZING, "completed", f"Assignments optimal. Delay: {optimized_plan.estimated_delay}m", duration_ms, data={"optimized_plan": optimized_plan.model_dump()})
         
         # Create compatible dict for ExecutionRuntime
         plan_data = {
@@ -187,7 +191,7 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
         duration_ms = int((time.perf_counter() - start_time) * 1000)
         
         if result.valid and result.scenario:
-            await broadcast_phase(scenario_id, RuntimePhase.VALIDATING, "completed", "All invariants passed.", duration_ms)
+            await broadcast_phase(scenario_id, RuntimePhase.VALIDATING, "completed", "All invariants passed.", duration_ms, data={"validation_result": {"valid": True}})
             
             # Phase 7: EXECUTING
             start_time = time.perf_counter()
@@ -235,7 +239,7 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
             reasons = "; ".join(result.validation_errors or ["Unknown validation error"])
             failure_reason = "Invariant Engine rejected the plan."
             constraint_violations = result.validation_errors or ["Unknown Validation Error"]
-            await broadcast_phase(scenario_id, RuntimePhase.VALIDATING, "failed", f"Validation rejected: {reasons}", duration_ms)
+            await broadcast_phase(scenario_id, RuntimePhase.VALIDATING, "failed", f"Validation rejected: {reasons}", duration_ms, data={"validation_result": {"valid": False, "errors": result.validation_errors}})
             
             operational_memory.record(
                 disruption_type=event_type,

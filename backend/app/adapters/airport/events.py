@@ -26,5 +26,11 @@ def get_events() -> List[AdapterEvent]:
             type="GateBlocked",
             severity=EventSeverity.critical,
             description="Gate is occupied by an unserviceable aircraft."
+        ),
+        AdapterEvent(
+            id="evt_early_pushback",
+            type="EarlyPushback",
+            severity=EventSeverity.warning,
+            description="ATC requested early pushback while fueling is incomplete."
         )
     ]

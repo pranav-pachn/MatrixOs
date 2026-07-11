@@ -89,7 +89,8 @@ export function ScenarioInitializer({ adapter }: Props) {
               setPhaseState(data.phase, {
                 status: status as any,
                 message: data.payload.message,
-                duration: data.payload.duration
+                duration: data.payload.duration,
+                data: data.payload.data
               });
               addEvent(data);
               break;
