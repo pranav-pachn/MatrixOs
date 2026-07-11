@@ -24,7 +24,7 @@ export function ConfidenceChart() {
   const data = useRuntimeStore((state) => state.confidenceData);
   return (
     <div className="bg-card/20 backdrop-blur-2xl rounded-2xl border border-border/50 shadow-2xl p-6 h-full flex flex-col relative overflow-hidden">
-      
+
       {/* Decorative ambient background */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none z-0" />
 
@@ -32,18 +32,18 @@ export function ConfidenceChart() {
         <h2 className="text-lg font-bold font-sans tracking-tight text-foreground">Strategy Efficacy Analysis</h2>
         <p className="text-[10px] uppercase tracking-widest text-primary/80 font-mono mt-1">Historical success rate of deployed automated strategies</p>
       </div>
-      
+
       <div className="flex-1 w-full min-h-[300px] relative z-10 -ml-4 mt-4">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
             <PolarGrid stroke="var(--border)" strokeDasharray="3 3" />
-            <PolarAngleAxis 
-              dataKey="strategy" 
-              tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: 'var(--font-mono)' }} 
+            <PolarAngleAxis
+              dataKey="strategy"
+              tick={{ fill: 'var(--muted-foreground)', fontSize: 10, fontFamily: 'var(--font-mono)' }}
             />
-            <PolarRadiusAxis 
-              angle={30} 
-              domain={[0, 100]} 
+            <PolarRadiusAxis
+              angle={30}
+              domain={[0, 100]}
               tick={{ fill: 'var(--muted)', fontSize: 10 }}
               axisLine={false}
               tickCount={6}

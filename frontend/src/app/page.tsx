@@ -5,6 +5,7 @@ import { BentoGrid } from "@/components/landing/BentoGrid";
 import { LogoStrip } from "@/components/landing/LogoStrip";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import DotGrid from "@/components/landing/DotGrid";
+import { ArchitectureTrust } from "@/components/landing/ArchitectureTrust";
 import { MatrixLogo } from "@/components/ui/MatrixLogo";
 
 export default function Home() {
@@ -40,6 +41,11 @@ export default function Home() {
         {/* 4. Feature Showcase */}
         <div className="mt-24 mb-0 w-full border-t border-white/[0.02] bg-gradient-to-b from-[#0A0A0C] to-[#000000]">
           <BentoGrid />
+        </div>
+
+        {/* 5. Trust Architecture (Documentation Style) */}
+        <div className="w-full relative z-10 bg-black">
+          <ArchitectureTrust />
         </div>
 
       </main>

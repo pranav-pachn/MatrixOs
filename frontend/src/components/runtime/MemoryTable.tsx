@@ -9,7 +9,7 @@ import { useRuntimeStore } from "@/lib/store/runtime";
 export function MemoryTable() {
   const [selectedMemId, setSelectedMemId] = useState<string | null>(null);
   const memories = useRuntimeStore((state) => state.memories);
-  
+
   const selectedMem = memories.find(m => m.id === selectedMemId);
 
   return (
@@ -19,7 +19,7 @@ export function MemoryTable() {
           <h2 className="text-lg font-bold font-sans tracking-tight text-foreground">Episodic Memory Bank</h2>
           <p className="text-xs text-muted-foreground font-sans mt-1">Historical resolution strategies and outcome telemetry.</p>
         </div>
-        
+
         <div className="flex-1 overflow-auto custom-scrollbar min-h-0">
           <table className="w-full text-left border-collapse relative">
             <thead className="sticky top-0 z-10">
@@ -33,9 +33,9 @@ export function MemoryTable() {
             </thead>
             <tbody className="font-mono text-sm">
               {memories.map((mem) => (
-                <motion.tr 
+                <motion.tr
                   layoutId={`row-${mem.id}`}
-                  key={mem.id} 
+                  key={mem.id}
                   onClick={() => setSelectedMemId(mem.id)}
                   className="border-b border-border/30 hover:bg-card/60 transition-colors cursor-pointer group"
                   whileHover={{ backgroundColor: "rgba(108, 99, 255, 0.1)" }}
@@ -73,7 +73,7 @@ export function MemoryTable() {
         {selectedMem && (
           <>
             {/* Backdrop */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -81,7 +81,7 @@ export function MemoryTable() {
               className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-6 cursor-pointer"
             >
               {/* Modal Card */}
-              <motion.div 
+              <motion.div
                 layoutId={`row-${selectedMem.id}`}
                 onClick={(e) => e.stopPropagation()}
                 className="bg-card border border-primary/50 shadow-[0_0_50px_rgba(108,99,255,0.3)] rounded-2xl w-full max-w-2xl overflow-hidden cursor-default"
@@ -93,17 +93,17 @@ export function MemoryTable() {
                       {selectedMem.type}
                       {selectedMem.outcome === "success" ? (
                         <span className="text-[10px] font-mono px-2 py-1 rounded bg-chart-4/10 text-chart-4 border border-chart-4/30 uppercase tracking-widest flex items-center gap-1">
-                          <CheckCircle weight="fill"/> Recovered
+                          <CheckCircle weight="fill" /> Recovered
                         </span>
                       ) : (
                         <span className="text-[10px] font-mono px-2 py-1 rounded bg-destructive/10 text-destructive border border-destructive/30 uppercase tracking-widest flex items-center gap-1">
-                          <XCircle weight="fill"/> Failed
+                          <XCircle weight="fill" /> Failed
                         </span>
                       )}
                     </h2>
                     <p className="text-sm font-mono text-muted-foreground mt-2">Archive ID: <span className="text-primary">{selectedMem.id}</span> • {new Date(selectedMem.date).toLocaleString()}</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setSelectedMemId(null)}
                     className="p-2 hover:bg-muted rounded-full transition-colors"
                   >
@@ -117,7 +117,7 @@ export function MemoryTable() {
                     <h3 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground mb-2">Executed Strategy</h3>
                     <div className="text-xl font-sans font-bold text-primary">{selectedMem.strategy}</div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 rounded-xl border border-border/50 bg-background/30 shadow-neu-inset">
                       <h3 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground mb-1">Neural Confidence</h3>
@@ -130,15 +130,15 @@ export function MemoryTable() {
                   </div>
 
                   <div className="p-4 rounded-xl border border-border/50 bg-background/30">
-                     <h3 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground mb-2">System Telemetry Log</h3>
-                     <div className="font-mono text-xs text-muted-foreground space-y-1">
-                       <p>{`> [${selectedMem.id}] Event detected: ${selectedMem.type}`}</p>
-                       <p>{`> Querying episodic memory banks...`}</p>
-                       <p>{`> Strategy loaded: ${selectedMem.strategy} (Confidence: ${selectedMem.confidence}%)`}</p>
-                       <p className={selectedMem.outcome === 'success' ? 'text-chart-4' : 'text-destructive'}>
-                         {`> Outcome: ${selectedMem.outcome.toUpperCase()}`}
-                       </p>
-                     </div>
+                    <h3 className="text-[10px] uppercase font-mono tracking-widest text-muted-foreground mb-2">System Telemetry Log</h3>
+                    <div className="font-mono text-xs text-muted-foreground space-y-1">
+                      <p>{`> [${selectedMem.id}] Event detected: ${selectedMem.type}`}</p>
+                      <p>{`> Querying episodic memory banks...`}</p>
+                      <p>{`> Strategy loaded: ${selectedMem.strategy} (Confidence: ${selectedMem.confidence}%)`}</p>
+                      <p className={selectedMem.outcome === 'success' ? 'text-chart-4' : 'text-destructive'}>
+                        {`> Outcome: ${selectedMem.outcome.toUpperCase()}`}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
