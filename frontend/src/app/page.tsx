@@ -6,6 +6,7 @@ import { LogoStrip } from "@/components/landing/LogoStrip";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import DotGrid from "@/components/landing/DotGrid";
 import { ArchitectureTrust } from "@/components/landing/ArchitectureTrust";
+import { IntegrationsSection } from "@/components/landing/IntegrationsSection";
 import { MatrixLogo } from "@/components/ui/MatrixLogo";
 
 export default function Home() {
@@ -46,6 +47,11 @@ export default function Home() {
         {/* 5. Trust Architecture (Documentation Style) */}
         <div className="w-full relative z-10 bg-black">
           <ArchitectureTrust />
+        </div>
+
+        {/* 6. Built for Integration */}
+        <div className="w-full relative z-10 bg-black">
+          <IntegrationsSection />
         </div>
 
       </main>
