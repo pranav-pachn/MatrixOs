@@ -17,7 +17,7 @@ export const hospitalScenario: Scenario = {
                 "id": "t1",
                 "name": "Triage Assessment",
                 "type": "medical",
-                "status": "COMPLETED",
+                "status": "complete",
                 "duration": 5,
                 "assignedResourceId": "RES-H2",
                 "dependencies": []
@@ -26,7 +26,7 @@ export const hospitalScenario: Scenario = {
                 "id": "t2",
                 "name": "CT Scan",
                 "type": "imaging",
-                "status": "PENDING",
+                "status": "pending",
                 "duration": 15,
                 "assignedResourceId": "RES-H1",
                 "dependencies": [
@@ -47,16 +47,16 @@ export const hospitalScenario: Scenario = {
                 "id": "t1",
                 "name": "Bay Assign",
                 "type": "logistics",
-                "status": "COMPLETED",
+                "status": "complete",
                 "duration": 2,
-                "assignedResourceId": null,
+                "assignedResourceId": undefined,
                 "dependencies": []
             },
             {
                 "id": "t2",
                 "name": "Patient Transfer",
                 "type": "medical",
-                "status": "RUNNING",
+                "status": "active",
                 "duration": 5,
                 "assignedResourceId": "RES-H3",
                 "dependencies": [
@@ -77,7 +77,7 @@ export const hospitalScenario: Scenario = {
                 "id": "t1",
                 "name": "Anesthesia",
                 "type": "medical",
-                "status": "COMPLETED",
+                "status": "complete",
                 "duration": 10,
                 "assignedResourceId": "RES-H3",
                 "dependencies": []
@@ -86,9 +86,9 @@ export const hospitalScenario: Scenario = {
                 "id": "t2",
                 "name": "Incision",
                 "type": "medical",
-                "status": "PENDING",
+                "status": "pending",
                 "duration": 60,
-                "assignedResourceId": null,
+                "assignedResourceId": undefined,
                 "dependencies": [
                     "t1"
                 ]
@@ -107,16 +107,16 @@ export const hospitalScenario: Scenario = {
                 "id": "t1",
                 "name": "Vitals Monitoring",
                 "type": "medical",
-                "status": "COMPLETED",
+                "status": "complete",
                 "duration": 5,
-                "assignedResourceId": null,
+                "assignedResourceId": undefined,
                 "dependencies": []
             },
             {
                 "id": "t2",
                 "name": "Ventilator Setup",
                 "type": "medical",
-                "status": "PENDING",
+                "status": "pending",
                 "duration": 15,
                 "assignedResourceId": "RES-H4",
                 "dependencies": [

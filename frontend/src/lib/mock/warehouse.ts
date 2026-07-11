@@ -17,7 +17,7 @@ export const warehouseScenario: Scenario = {
                 "id": "t1",
                 "name": "Pallet Picking",
                 "type": "logistics",
-                "status": "COMPLETED",
+                "status": "complete",
                 "duration": 25,
                 "assignedResourceId": "RES-W3",
                 "dependencies": []
@@ -26,7 +26,7 @@ export const warehouseScenario: Scenario = {
                 "id": "t2",
                 "name": "Dock Loading",
                 "type": "loading",
-                "status": "PENDING",
+                "status": "pending",
                 "duration": 15,
                 "assignedResourceId": "RES-W4",
                 "dependencies": [
@@ -47,7 +47,7 @@ export const warehouseScenario: Scenario = {
                 "id": "t1",
                 "name": "Unload",
                 "type": "loading",
-                "status": "COMPLETED",
+                "status": "complete",
                 "duration": 10,
                 "assignedResourceId": "RES-W2",
                 "dependencies": []
@@ -56,7 +56,7 @@ export const warehouseScenario: Scenario = {
                 "id": "t2",
                 "name": "Sort",
                 "type": "logistics",
-                "status": "RUNNING",
+                "status": "active",
                 "duration": 30,
                 "assignedResourceId": "RES-W3",
                 "dependencies": [
@@ -77,16 +77,16 @@ export const warehouseScenario: Scenario = {
                 "id": "t1",
                 "name": "Path Calculation",
                 "type": "logistics",
-                "status": "COMPLETED",
+                "status": "complete",
                 "duration": 2,
-                "assignedResourceId": null,
+                "assignedResourceId": undefined,
                 "dependencies": []
             },
             {
                 "id": "t2",
                 "name": "Transport",
                 "type": "logistics",
-                "status": "PENDING",
+                "status": "pending",
                 "duration": 15,
                 "assignedResourceId": "RES-W1",
                 "dependencies": [
@@ -107,16 +107,16 @@ export const warehouseScenario: Scenario = {
                 "id": "t1",
                 "name": "Staging",
                 "type": "logistics",
-                "status": "COMPLETED",
+                "status": "complete",
                 "duration": 5,
-                "assignedResourceId": null,
+                "assignedResourceId": undefined,
                 "dependencies": []
             },
             {
                 "id": "t2",
                 "name": "Loading",
                 "type": "loading",
-                "status": "PENDING",
+                "status": "pending",
                 "duration": 15,
                 "assignedResourceId": "RES-W2",
                 "dependencies": [
