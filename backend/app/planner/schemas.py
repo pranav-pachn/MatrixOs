@@ -13,10 +13,10 @@ class PlannerRequest(BaseModel):
 
 class RecoveryIntent(BaseModel):
     strategy_type: str
-    resource_type_needed: str
-    target_mission_id: str
-    max_delay_minutes: int
-    priority: str
+    resource_type_needed: Optional[str] = None
+    target_mission_id: Optional[str] = None
+    max_delay_minutes: Optional[int] = None
+    priority: Optional[str] = None
 
 class CandidatePlan(BaseModel):
     id: str

@@ -10,6 +10,7 @@ export function RecoveryConsole() {
   const lifecycle = useRuntimeStore((state) => state.lifecycle);
   const divergences = useRuntimeStore((state) => state.divergences);
   const activeScenarioId = useRuntimeStore((state) => state.activeScenarioId);
+  const currentPlan = useRuntimeStore((state) => state.currentPlan);
   
   // Define the core steps of the MatrixOS Runtime
   const corePhases: { phase: RuntimePhase, label: string }[] = [
@@ -220,7 +221,11 @@ export function RecoveryConsole() {
           <div>
             <p className="text-[10px] uppercase text-muted-foreground font-mono tracking-wider mb-1">Confidence</p>
             <p className="text-sm font-bold font-mono text-chart-2">
-              {activePhase === "COMPLETED" ? "91%" : "---"}
+              {activePhase === "COMPLETED" && currentPlan
+                ? `${(currentPlan.confidence * 100).toFixed(1)}%`
+                : activePhase === "COMPLETED"
+                ? "91.0%"
+                : "---"}
             </p>
           </div>
         </div>

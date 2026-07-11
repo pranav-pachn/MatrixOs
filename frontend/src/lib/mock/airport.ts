@@ -13,8 +13,8 @@ export const airportScenario: Scenario = {
       priority: 1,
       deadline: "2026-07-09T18:30:00.000Z",
       tasks: [
-        { id: "t1", name: "Deboarding", type: "pax", status: "complete", duration: 15, dependencies: [] },
-        { id: "t2", name: "Fueling", type: "fuel", status: "pending", duration: 20, dependencies: [] }
+        { id: "t1", name: "Deboarding", type: "pax", status: "COMPLETED", duration: 15, assignedResourceId: "RES-02", dependencies: [] },
+        { id: "t2", name: "Fueling", type: "fuel", status: "PENDING", duration: 20, assignedResourceId: "RES-01", dependencies: [] }
       ],
     },
     {
@@ -25,9 +25,9 @@ export const airportScenario: Scenario = {
       priority: 2,
       deadline: "2026-07-09T19:30:00.000Z",
       tasks: [
-        { id: "t1", name: "Gate Assign", type: "gate", status: "complete", duration: 5, dependencies: [] },
-        { id: "t2", name: "Taxi", type: "ground", status: "active", duration: 10, dependencies: [] },
-        { id: "t3", name: "Block In", type: "ground", status: "pending", duration: 2, dependencies: [] }
+        { id: "t1", name: "Gate Assign", type: "gate", status: "COMPLETED", duration: 5, assignedResourceId: "RES-03", dependencies: [] },
+        { id: "t2", name: "Taxi", type: "ground", status: "RUNNING", duration: 10, assignedResourceId: null, dependencies: ["t1"] },
+        { id: "t3", name: "Block In", type: "ground", status: "PENDING", duration: 2, assignedResourceId: null, dependencies: ["t2"] }
       ],
     }
   ],

@@ -31,7 +31,7 @@ class RecoveryIntelligenceService:
             id=f"rie_{uuid.uuid4().hex[:6]}",
             title=f"[RIE] {best_strategy.title}",
             description=best_strategy.description,
-            strategy=best_strategy.strategy,
+            strategy="RIE Alternative",
             affected_resources=[], # Filled dynamically by policy/optimizer
             estimated_delay=best_strategy.estimated_delay,
             confidence=best_strategy.confidence,

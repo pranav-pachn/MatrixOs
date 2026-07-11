@@ -45,6 +45,17 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = "TB") => 
   return { nodes: layoutedNodes, edges };
 };
 
+// Normalize status to lowercase for consistent display
+const normalizeStatus = (status: string): string => {
+  const s = (status || "").toLowerCase();
+  if (s === "completed") return "complete";
+  if (s === "running") return "active";
+  if (s === "in-progress" || s === "in_progress") return "active";
+  if (s === "diverged") return "diverged";
+  if (s === "failed") return "failed";
+  return s;
+};
+
 function OperationalGraphInner() {
   const missions = useRuntimeStore((state) => state.missions);
   const resources = useRuntimeStore((state) => state.resources);
@@ -62,63 +73,91 @@ function OperationalGraphInner() {
 
   // When store data changes, recalculate the dagre layout
   useEffect(() => {
-    // Generate dynamic nodes and edges from missions and resources
     const dynamicNodes: Node[] = [];
     const dynamicEdges: Edge[] = [];
 
-    // Find all resources that are actually assigned to tasks to prevent floating disconnected nodes
+    // Build a set of all assigned resource IDs (case-insensitive check)
     const assignedResourceIds = new Set(
-      missions.flatMap(mission => mission.tasks.map(task => task.assignedResourceId)).filter(Boolean)
+      missions.flatMap(m => m.tasks.map(t => t.assignedResourceId)).filter(Boolean)
     );
 
-    // Add Resources (Only those assigned to active tasks)
+    // Add Resources — always show if assigned to a task OR if they are in a failed state
     resources.forEach((res) => {
-      if (assignedResourceIds.has(res.id) || res.status === "FAILED") {
+      const statusNorm = normalizeStatus(res.status);
+      if (assignedResourceIds.has(res.id) || statusNorm === "failed") {
         dynamicNodes.push({
           id: res.id,
           type: "resourceNode",
           position: { x: 0, y: 0 },
-          data: { label: res.name, status: res.status.toLowerCase() },
+          data: { label: res.name, status: statusNorm },
         });
       }
     });
 
-    // Add Missions and Tasks
+    // Add Mission nodes, Task nodes, and edges
     missions.forEach((mission) => {
+      const missionStatus = normalizeStatus(mission.status);
       dynamicNodes.push({
         id: mission.id,
         type: "missionNode",
         position: { x: 0, y: 0 },
-        data: { label: mission.name, status: mission.status.toLowerCase() },
+        data: { label: mission.name, status: missionStatus },
+      });
+
+      // Build a local task id map for dependency resolution within this mission
+      const taskNodeIds: Record<string, string> = {};
+      mission.tasks.forEach((task) => {
+        taskNodeIds[task.id] = `${mission.id}-${task.id}`;
       });
 
       mission.tasks.forEach((task) => {
-        const taskId = `${mission.id}-${task.id}`;
+        const taskNodeId = `${mission.id}-${task.id}`;
+        const taskStatus = normalizeStatus(task.status);
+
         dynamicNodes.push({
-          id: taskId,
+          id: taskNodeId,
           type: "taskNode",
           position: { x: 0, y: 0 },
-          data: { label: task.name, status: task.status.toLowerCase() },
+          data: { label: task.name, status: taskStatus },
         });
 
-        // Edge: Mission -> Task
-        dynamicEdges.push({
-          id: `e-${mission.id}-${taskId}`,
-          source: mission.id,
-          target: taskId,
-          type: "smoothstep",
-          animated: task.status !== "COMPLETED",
-          style: { stroke: "#6C63FF", strokeWidth: 2 },
-        });
-
-        // Edge: Task -> Resource
-        if (task.assignedResourceId) {
+        // Determine source: if task has dependencies, connect from last dep; else from mission
+        const deps: string[] = (task.dependencies || []) as string[];
+        if (deps.length > 0) {
+          deps.forEach((depId) => {
+            const depNodeId = taskNodeIds[depId];
+            if (depNodeId) {
+              dynamicEdges.push({
+                id: `e-dep-${depNodeId}-${taskNodeId}`,
+                source: depNodeId,
+                target: taskNodeId,
+                type: "smoothstep",
+                animated: taskStatus !== "complete",
+                style: { stroke: "#6C63FF", strokeWidth: 2 },
+              });
+            }
+          });
+        } else {
+          // No dependencies → connect directly from mission
           dynamicEdges.push({
-            id: `e-${taskId}-${task.assignedResourceId}`,
-            source: taskId,
+            id: `e-${mission.id}-${taskNodeId}`,
+            source: mission.id,
+            target: taskNodeId,
+            type: "smoothstep",
+            animated: taskStatus !== "complete",
+            style: { stroke: "#6C63FF", strokeWidth: 2 },
+          });
+        }
+
+        // Edge: Task -> Resource (dashed red)
+        if (task.assignedResourceId && assignedResourceIds.has(task.assignedResourceId)) {
+          const isActive = taskStatus === "active" || taskStatus === "running";
+          dynamicEdges.push({
+            id: `e-res-${taskNodeId}-${task.assignedResourceId}`,
+            source: taskNodeId,
             target: task.assignedResourceId,
             type: "smoothstep",
-            animated: task.status === "RUNNING",
+            animated: isActive,
             style: { stroke: "#FF4D4D", strokeWidth: 2, strokeDasharray: "5,5" },
           });
         }
@@ -126,7 +165,6 @@ function OperationalGraphInner() {
     });
 
     if (dynamicNodes.length > 0) {
-      // Use LR (Left-to-Right) layout for a cleaner timeline appearance
       const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(dynamicNodes, dynamicEdges, "LR");
       setNodes(layoutedNodes);
       setEdges(layoutedEdges);

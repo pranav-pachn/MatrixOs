@@ -9,11 +9,11 @@ export function TriggerEventPanel() {
   const [injectingId, setInjectingId] = useState<string | null>(null);
 
   const airportTriggers = [
-    { id: "fuel", label: "Fuel Truck Failure", icon: Lightning, glow: "group-hover:shadow-[0_0_20px_rgba(255,77,77,0.4)] group-hover:border-destructive/60", iconColor: "text-destructive group-hover:text-destructive" },
-    { id: "weather", label: "Heavy Rain (Cat 2)", icon: CloudRain, glow: "group-hover:shadow-[0_0_20px_rgba(41,182,246,0.4)] group-hover:border-chart-3/60", iconColor: "text-chart-3 group-hover:text-chart-3" },
-    { id: "gate", label: "Gate B12 Blocked", icon: WarningCircle, glow: "group-hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] group-hover:border-chart-2/60", iconColor: "text-chart-2 group-hover:text-chart-2" },
-    { id: "crew", label: "Crew Unavailable", icon: Users, glow: "group-hover:shadow-[0_0_20px_rgba(0,208,132,0.4)] group-hover:border-chart-4/60", iconColor: "text-chart-4 group-hover:text-chart-4" },
-    { id: "emergency", label: "Emergency Arrival", icon: Ambulance, glow: "group-hover:shadow-[0_0_20px_rgba(108,99,255,0.4)] group-hover:border-primary/60", iconColor: "text-primary group-hover:text-primary" },
+    { id: "FuelTruckFailure", label: "Fuel Truck Failure", icon: Lightning, glow: "group-hover:shadow-[0_0_20px_rgba(255,77,77,0.4)] group-hover:border-destructive/60", iconColor: "text-destructive group-hover:text-destructive" },
+    { id: "EarlyPushback", label: "Early Pushback (ATC)", icon: WarningCircle, glow: "group-hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] group-hover:border-chart-2/60", iconColor: "text-chart-2 group-hover:text-chart-2" },
+    { id: "HeavyRain", label: "Heavy Rain (Cat 2)", icon: CloudRain, glow: "group-hover:shadow-[0_0_20px_rgba(41,182,246,0.4)] group-hover:border-chart-3/60", iconColor: "text-chart-3 group-hover:text-chart-3" },
+    { id: "GateBlocked", label: "Gate Blocked", icon: WarningCircle, glow: "group-hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] group-hover:border-chart-2/60", iconColor: "text-chart-2 group-hover:text-chart-2" },
+    { id: "CrewUnavailable", label: "Crew Unavailable", icon: Users, glow: "group-hover:shadow-[0_0_20px_rgba(0,208,132,0.4)] group-hover:border-chart-4/60", iconColor: "text-chart-4 group-hover:text-chart-4" },
   ];
 
   const hospitalTriggers = [

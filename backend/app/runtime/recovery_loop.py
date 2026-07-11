@@ -111,6 +111,10 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
         best_plan = policy_engine.choose(candidate_plans, objectives)
         failed_strategy_title = best_plan.title
         
+        # Populate affected_resources from scenario's diverged missions if not already set
+        if not best_plan.affected_resources:
+            best_plan.affected_resources = [m.id for m in scenario.missions if m.status in ("DIVERGED", "diverged", "IN-PROGRESS", "IN_PROGRESS")][:3]
+        
         duration_ms = int((time.perf_counter() - start_time) * 1000)
         await broadcast_phase(scenario_id, RuntimePhase.POLICY, "completed", f"Selected Strategy: {best_plan.title}", duration_ms, data={"selected_plan": best_plan.model_dump()})
 
@@ -233,6 +237,7 @@ async def run_recovery_loop(scenario_id: str, event_type: str, divergence_id: st
             
             duration_ms = int((time.perf_counter() - start_time) * 1000)
             await broadcast_phase(scenario_id, RuntimePhase.EXECUTING, "completed", "Recovery executed successfully.", duration_ms)
+            await broadcast_phase(scenario_id, RuntimePhase.COMPLETED, "completed", "Pipeline complete. World state restored.", duration_ms)
             break
             
         else:
