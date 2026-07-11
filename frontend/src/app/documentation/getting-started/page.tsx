@@ -42,6 +42,87 @@ export default function GettingStartedPage() {
         </p>
       </div>
 
+      <h2 id="matrixos-architecture">MatrixOS Architecture</h2>
+      <p>
+        The MatrixOS runtime is composed of reusable core services and interchangeable domain adapters. Every environment contributes resources, tasks, constraints, and events into one continuously synchronized Shared World Model.
+      </p>
+
+      <div className="my-10 w-full flex justify-center">
+        <img 
+          src="/docs/architecture.png" 
+          alt="MatrixOS Architecture" 
+          className="w-[80%] rounded-xl border border-white/10 shadow-sm opacity-95 object-contain" 
+        />
+      </div>
+
+      <ul>
+        <li><strong>Domain Adapter:</strong> Translates domain-specific vocabulary into standard runtime entities.</li>
+        <li><strong>Shared World Model:</strong> The single source of truth for the entire environment state.</li>
+        <li><strong>Operational Graph:</strong> The real-time dependency tree of all tasks and resources.</li>
+        <li><strong>Runtime Engine:</strong> The core loop that continually ingests events.</li>
+        <li><strong>Planner:</strong> The AI agent that reasons over the state to plan recoveries.</li>
+        <li><strong>Recovery:</strong> Strategies automatically generated to resolve disruptions.</li>
+        <li><strong>Validation:</strong> Deterministic safety checks before any action executes.</li>
+      </ul>
+
+      <h2 id="runtime-execution-pipeline">Runtime Execution Pipeline</h2>
+      <p>
+        Once an environment is running, MatrixOS continuously synchronizes reality with the operational graph. Every incoming event updates the world model before validation and planning occur.
+      </p>
+
+      <div className="my-10 w-full flex justify-center">
+        <img 
+          src="/docs/runtime-pipeline.png" 
+          alt="Runtime Execution Pipeline" 
+          className="w-[80%] rounded-xl border border-white/10 shadow-sm opacity-95 object-contain" 
+        />
+      </div>
+
+      <ul>
+        <li><strong>Event arrives:</strong> Telemetry or an explicit alert triggers an update.</li>
+        <li><strong>World State updates:</strong> The internal model perfectly reflects the external reality.</li>
+        <li><strong>Graph synchronizes:</strong> Dependencies instantly shift based on the new state.</li>
+        <li><strong>Constraints checked:</strong> The validation engine ensures safety bounds are held.</li>
+        <li><strong>Divergence detected:</strong> The system flags any constraint violations.</li>
+        <li><strong>Recovery planning:</strong> The Planner generates multiple potential solutions.</li>
+        <li><strong>Validation:</strong> Every solution is rigorously tested against rules.</li>
+        <li><strong>Execution:</strong> The safest, most optimal recovery plan is dispatched.</li>
+        <li><strong>Monitoring:</strong> The cycle resumes instantly.</li>
+      </ul>
+
+      <h2 id="recovery-decision-flow">Recovery Decision Flow</h2>
+      <p>
+        When operational constraints are violated, MatrixOS explores multiple recovery strategies, validates each one deterministically, and executes only safe recoveries.
+      </p>
+
+      <div className="my-10 w-full flex justify-center">
+        <img 
+          src="/docs/recovery-flow.png" 
+          alt="Recovery Decision Flow" 
+          className="w-[80%] rounded-xl border border-white/10 shadow-sm opacity-95 object-contain" 
+        />
+      </div>
+
+      <ol>
+        <li><strong>Disruption detected</strong></li>
+        <li><strong>Impact analysis</strong></li>
+        <li><strong>Generate recovery options</strong></li>
+        <li><strong>Validate every option</strong></li>
+        <li><strong>Reject invalid plans</strong></li>
+        <li><strong>Choose safest valid recovery</strong></li>
+        <li><strong>Execute recovery</strong></li>
+        <li><strong>Learn from execution</strong></li>
+      </ol>
+
+      <div className="bg-[#0B0B0B] border border-white/[0.08] p-6 rounded-xl my-8">
+        <h4 className="text-white font-semibold flex items-center gap-2 mb-2">
+          <span className="text-primary">📌</span> Why this matters
+        </h4>
+        <p className="text-[#A1A1AA] m-0">
+          Unlike traditional workflow engines that execute a predefined path, MatrixOS continuously reasons about reality and adapts safely while preserving operational constraints.
+        </p>
+      </div>
+
       <h2 id="installation">Installation</h2>
       <p>
         MatrixOS runs as a distributed cluster, but you can run the unified playground locally for development and simulation.
